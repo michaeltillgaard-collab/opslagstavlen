@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Afdeling 55 Strandhusene - Opslagstavle</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1e3a8a">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .font-size-sm { font-size: 0.9rem; }
+    .font-size-base { font-size: 1.1rem; }
+    .font-size-lg { font-size: 1.35rem; }
+    .font-size-xl { font-size: 1.6rem; }
+
+    .font-size-sm .card-title { font-size: 1.25rem; }
+    .font-size-base .card-title { font-size: 1.5rem; }
+    .font-size-lg .card-title { font-size: 1.8rem; }
+    .font-size-xl .card-title { font-size: 2.1rem; }
+
+    .toast-enter { transform: translateY(100%); opacity: 0; }
+    .toast-enter-active { transform: translateY(0); opacity: 1; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .toast-exit { transform: translateY(100%); opacity: 0; transition: all 0.3s ease-in; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col font-size-base transition-all duration-200">
+
+  <!-- Header -->
+  <header class="bg-blue-900 text-white shadow-md sticky top-0 z-30">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
+      <div class="flex items-center gap-3">
+        <div class="bg-amber-500 text-blue-950 p-2.5 rounded-xl font-bold text-xl shadow flex items-center justify-center">
+          <i class="fa-solid fa-house-user"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-xl leading-tight">Afdeling 55 Strandhusene</h1>
+          <p class="text-xs text-blue-200">Digital Opslagstavle for Beboere</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 ms-auto">
+        <!-- Font Size Controls -->
+        <div class="bg-blue-950/60 rounded-lg p-1 flex items-center border border-blue-700/50" title="Tilpas tekststørrelse">
+          <span class="text-xs text-blue-300 px-1.5 font-medium">Skrift:</span>
+          <button onclick="setFontSize('sm')" id="btn-fs-sm" class="px-2 py-1 text-xs rounded hover:bg-blue-800 text-blue-200 font-bold">A</button>
+          <button onclick="setFontSize('base')" id="btn-fs-base" class="px-2 py-1 text-sm rounded bg-blue-700 text-white font-bold">A+</button>
+          <button onclick="setFontSize('lg')" id="btn-fs-lg" class="px-2 py-1 text-base rounded hover:bg-blue-800 text-blue-200 font-bold">A++</button>
+        </div>
+
+        <!-- Role Toggle Button -->
+        <button id="role-toggle-btn" onclick="openLoginModal()" class="bg-amber-500 hover:bg-amber-400 text-blue-950 font-bold px-3 py-1.5 rounded-lg text-sm transition flex items-center gap-1.5 shadow">
+          <i class="fa-solid fa-user-gear"></i>
+          <span id="role-btn-text">Skift til Bestyrelse</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Sub-header indicator bar -->
+    <div class="bg-blue-950 text-blue-100 px-4 py-1.5 text-xs border-t border-blue-800/60">
+      <div class="max-w-4xl mx-auto flex justify-between items-center">
+        <span id="role-indicator" class="flex items-center gap-1.5 font-medium">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          Visning: <strong class="text-white">Beboer (Læse-adgang)</strong>
+        </span>
+        <span id="last-updated-text" class="text-blue-300">Opdateret senest: i dag</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="flex-grow max-w-4xl w-full mx-auto p-4">
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-200 relative">
+        <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-xl font-bold p-1">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        
+        <div class="text-center mb-5">
+          <div class="w-12 h-12 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
+            <i class="fa-solid fa-lock"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900">Bestyrelsesadgang</h3>
+          <p class="text-sm text-slate-600 mt-1">Indtast adgangskoden for at oprette og administrere opslag.</p>
+        </div>
+
+        <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+          <div>
+            <label for="password-input" class="block text-sm font-semibold text-slate-700 mb-1">Adgangskode</label>
+            <input type="password" id="password-input" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 font-mono text-base" placeholder="Indtast kode..." required>
+            <p id="login-error" class="text-rose-600 text-xs mt-1.5 hidden flex items-center gap-1 font-medium">
+              <i class="fa-solid fa-circle-exclamation"></i> Forkert adgangskode. Prøv igen.
+            </p>
+          </div>
+
+          <div class="flex gap-3 pt-2">
+            <button type="button" onclick="closeLoginModal()" class="w-1/2 py-2.5 px-4 rounded-lg border border-slate-300 text-slate-700 font-semibold hover:bg-slate-50 transition">
+              Annuller
+            </button>
+            <button type="submit" class="w-1/2 py-2.5 px-4 rounded-lg bg-blue-900 text-white font-semibold hover:bg-blue-800 transition shadow">
+              Lås op
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Opslagstavle Container -->
+    <div id="view-board" class="space-y-6">
+
+      <!-- Admin Panel: Opret nyt opslag (vises kun i Admin-tilstand) -->
+      <section id="admin-panel" class="hidden bg-amber-50 border-2 border-amber-300 rounded-2xl p-5 shadow-sm space-y-4">
+        <div class="flex justify-between items-center border-b border-amber-200 pb-3">
+          <h2 class="text-lg font-bold text-amber-950 flex items-center gap-2">
+            <i class="fa-solid fa-pen-to-square text-amber-600"></i> Opret nyt opslag (Kun Bestyrelsen)
+          </h2>
+          <span class="bg-amber-200 text-amber-900 text-xs px-2.5 py-1 rounded-full font-bold">Admin Tilstand</span>
+        </div>
+
+        <form id="notice-form" onsubmit="createNotice(event)" class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1">Overskrift *</label>
+            <input type="text" id="post-title" required class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 text-slate-800 bg-white" placeholder="F.eks. Hækklipning i fællesarealer på tirsdag">
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1">Kategori *</label>
+              <select id="post-category" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 bg-white">
+                <option value="vigtigt">🚨 Vigtigt / Haster</option>
+                <option value="arrangement">🎉 Arrangement / Fællesskab</option>
+                <option value="vedligehold">🛠️ Vedligehold & Drift</option>
+                <option value="info" selected>📢 Generel Information</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-1">Afsender *</label>
+              <input type="text" id="post-author" required value="Bestyrelsen" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 bg-white">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1">Meddelelse / Brødtekst *</label>
+            <textarea id="post-body" required rows="4" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 text-slate-800 bg-white" placeholder="Skriv den fulde besked til beboerne her..."></textarea>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-4 bg-amber-100/60 p-3 rounded-xl border border-amber-200">
+            <div class="flex items-center gap-4">
+              <label class="flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" id="post-pinned" class="w-5 h-5 text-blue-900 rounded focus:ring-blue-600">
+                <span class="text-sm font-medium text-slate-800"><i class="fa-solid fa-thumbtack text-amber-600"></i> Fastgør øverst</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" id="post-push" checked class="w-5 h-5 text-blue-900 rounded focus:ring-blue-600">
+                <span class="text-sm font-medium text-slate-800"><i class="fa-solid fa-bell text-emerald-600"></i> Send straks som Push-meddelelse</span>
+              </label>
+            </div>
+
+            <button type="submit" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-6 py-2.5 rounded-xl shadow transition flex items-center gap-2">
+              <i class="fa-solid fa-paper-plane"></i> Offentliggør Opslag
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Søgning & Kategori-filtrering -->
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 justify-between items-center">
+        <div class="relative w-full md:w-72">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400"></i>
+          <input type="text" id="search-input" oninput="renderNotices()" placeholder="Søg i opslag..." class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 text-sm">
+        </div>
+        
+        <div class="flex flex-wrap gap-1.5 w-full md:w-auto">
+          <button onclick="setFilter('all')" id="filter-all" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-900 text-white">Alle</button>
+          <button onclick="setFilter('vigtigt')" id="filter-vigtigt" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">🚨 Vigtigt</button>
+          <button onclick="setFilter('arrangement')" id="filter-arrangement" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">🎉 Arrangementer</button>
+          <button onclick="setFilter('vedligehold')" id="filter-vedligehold" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">🛠️ Vedligehold</button>
+          <button onclick="setFilter('info')" id="filter-info" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">📢 Info</button>
+        </div>
+      </div>
+
+      <!-- Opslagskort Container -->
+      <div id="notices-container" class="space-y-4">
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-slate-800 text-slate-400 text-center py-6 text-sm border-t border-slate-700 mt-auto">
+    <div class="max-w-4xl mx-auto px-4 space-y-2">
+      <p>© 2026 Afdeling 55 Strandhusene – Seniorbofællesskab</p>
+      <p class="text-xs text-slate-500">Envejs digital opslagstavle. Udviklet til nem læsning på tablets og smartphones.</p>
+    </div>
+  </footer>
+
+  <!-- Container til Push Notifications (Toasts) -->
+  <div id="push-toast-container" class="fixed bottom-5 right-5 left-5 md:left-auto md:w-96 z-50 pointer-events-none space-y-3">
+  </div>
+
+  <script>
+    const ADMIN_PASSWORD = "!2026-strandhusene";
+
+    const initialNotices = [
+      {
+        id: "1",
+        title: "Ordinært afdelingsmøde i fælleshuset",
+        category: "vigtigt",
+        author: "Bestyrelsen",
+        date: "5. november 2026",
+        pinned: true,
+        body: "Husk det årlige afdelingsmøde på tirsdag kl. 19:00 i Fælleshuset. Dagsorden og årsregnskab er omdelt i postkasserne. Vi starter med kaffe og kage fra kl. 18:30. Vel mødt!"
+      },
+      {
+        id: "2",
+        title: "Fælles Suppeaften på torsdag",
+        category: "arrangement",
+        author: "Festudvalget / Grethe",
+        date: "3. november 2026",
+        pinned: false,
+        body: "Vi gentager succesen og laver en varm græskarsuppe i fælleskøkkenet på torsdag kl. 17:30. Pris per næse er 25 kr. Tilmelding senest onsdag på sedlen i hallen."
+      },
+      {
+        id: "3",
+        title: "Rengøring og udluftning af affaldsrum",
+        category: "vedligehold",
+        author: "Varmemesteren",
+        date: "1. november 2026",
+        pinned: false,
+        body: "Affaldsrummet ved blok B vil være lukket for grundig spuling og desinficering fredag formiddag mellem 08:00 og 12:00. Benyt venligst containeren ved indkørslen i dette tidsrum."
+      }
+    ];
+
+    let notices = [];
+    let isAdmin = false;
+    let currentFilter = 'all';
+
+    function initData() {
+      const stored = localStorage.getItem('strandhusene_notices');
+      if (stored) {
+        try {
+          notices = JSON.parse(stored);
+        } catch (e) {
+          notices = initialNotices;
+        }
+      } else {
+        notices = initialNotices;
+        saveData();
+      }
+      renderNotices();
+    }
+
+    function saveData() {
+      localStorage.setItem('strandhusene_notices', JSON.stringify(notices));
+    }
+
+    function openLoginModal() {
+      if (isAdmin) {
+        isAdmin = false;
+        updateRoleUI();
+        showPushNotification("Logget ud", "Du er nu i Beboervisning (Læseadgang).", "info");
+      } else {
+        document.getElementById('password-input').value = '';
+        document.getElementById('login-error').classList.add('hidden');
+        document.getElementById('login-modal').classList.remove('hidden');
+        document.getElementById('password-input').focus();
+      }
+    }
+
+    function closeLoginModal() {
+      document.getElementById('login-modal').classList.add('hidden');
+    }
+
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('password-input').value;
+      if (input === ADMIN_PASSWORD) {
+        isAdmin = true;
+        closeLoginModal();
+        updateRoleUI();
+        showPushNotification("Bestyrelsesadgang bekræftet", "Du har nu adgang til at oprette og slette opslag.", "vigtigt");
+      } else {
+        document.getElementById('login-error').classList.remove('hidden');
+      }
+    }
+
+    function updateRoleUI() {
+      const adminPanel = document.getElementById('admin-panel');
+      const roleText = document.getElementById('role-btn-text');
+      const roleIndicator = document.getElementById('role-indicator');
+      const toggleBtn = document.getElementById('role-toggle-btn');
+
+      if (isAdmin) {
+        adminPanel.classList.remove('hidden');
+        roleText.textContent = "Log ud af Bestyrelse";
+        toggleBtn.className = "bg-rose-600 hover:bg-rose-500 text-white font-bold px-3 py-1.5 rounded-lg text-sm transition flex items-center gap-1.5 shadow";
+        roleIndicator.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> Visning: <strong class="text-amber-300">Bestyrelse (Admin & Rediger)</strong>';
+      } else {
+        adminPanel.classList.add('hidden');
+        roleText.textContent = "Skift til Bestyrelse";
+        toggleBtn.className = "bg-amber-500 hover:bg-amber-400 text-blue-950 font-bold px-3 py-1.5 rounded-lg text-sm transition flex items-center gap-1.5 shadow";
+        roleIndicator.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Visning: <strong class="text-white">Beboer (Læse-adgang)</strong>';
+      }
+      renderNotices();
+    }
+
+    function setFontSize(size) {
+      document.body.classList.remove('font-size-sm', 'font-size-base', 'font-size-lg', 'font-size-xl');
+      document.body.classList.add('font-size-' + size);
+
+      ['sm', 'base', 'lg'].forEach(s => {
+        const btn = document.getElementById('btn-fs-' + s);
+        if (s === size) {
+          btn.className = "px-2 py-1 text-sm rounded bg-blue-700 text-white font-bold";
+        } else {
+          btn.className = "px-2 py-1 text-xs rounded hover:bg-blue-800 text-blue-200 font-bold";
+        }
+      });
+    }
+
+    function setFilter(cat) {
+      currentFilter = cat;
+      ['all', 'vigtigt', 'arrangement', 'vedligehold', 'info'].forEach(c => {
+        const btn = document.getElementById('filter-' + c);
+        if (c === cat) {
+          btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-900 text-white shadow-sm";
+        } else {
+          btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200";
+        }
+      });
+      renderNotices();
+    }
+
+    function getCategoryBadge(cat) {
+      switch(cat) {
+        case 'vigtigt':
+          return '<span class="bg-rose-100 text-rose-800 border border-rose-300 text-xs px-2.5 py-1 rounded-full font-bold flex items-center gap-1"><i class="fa-solid fa-triangle-exclamation"></i> Vigtigt</span>';
+        case 'arrangement':
+          return '<span class="bg-purple-100 text-purple-800 border border-purple-300 text-xs px-2.5 py-1 rounded-full font-bold flex items-center gap-1"><i class="fa-solid fa-cake-candles"></i> Arrangement</span>';
+        case 'vedligehold':
+          return '<span class="bg-amber-100 text-amber-900 border border-amber-300 text-xs px-2.5 py-1 rounded-full font-bold flex items-center gap-1"><i class="fa-solid fa-wrench"></i> Vedligehold</span>';
+        default:
+          return '<span class="bg-blue-100 text-blue-800 border border-blue-300 text-xs px-2.5 py-1 rounded-full font-bold flex items-center gap-1"><i class="fa-solid fa-circle-info"></i> Information</span>';
+      }
+    }
+
+    function renderNotices() {
+      const container = document.getElementById('notices-container');
+      const search = document.getElementById('search-input').value.toLowerCase();
+
+      let filtered = notices.filter(n => {
+        const matchesFilter = currentFilter === 'all' || n.category === currentFilter;
+        const matchesSearch = n.title.toLowerCase().includes(search) || n.body.toLowerCase().includes(search) || n.author.toLowerCase().includes(search);
+        return matchesFilter && matchesSearch;
+      });
+
+      filtered.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white p-8 text-center rounded-2xl border border-slate-200 text-slate-500 space-y-2">
+            <i class="fa-solid fa-inbox text-4xl text-slate-300 mb-2"></i>
+            <p class="font-medium text-base">Ingen opslag fundet.</p>
+            <p class="text-xs">Prøv at ændre dine søgekriterier eller vælg en anden kategori.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(n => `
+        <article class="bg-white rounded-2xl border ${n.pinned ? 'border-amber-400 ring-2 ring-amber-200' : 'border-slate-200'} p-5 shadow-sm space-y-3 relative transition hover:shadow-md">
+          ${n.pinned ? '<div class="absolute -top-3 right-4 bg-amber-500 text-blue-950 font-bold text-xs px-2.5 py-0.5 rounded-full shadow flex items-center gap-1"><i class="fa-solid fa-thumbtack"></i> Fastgjort</div>' : ''}
+          
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2">
+              ${getCategoryBadge(n.category)}
+              <span class="text-xs text-slate-500 font-medium"><i class="fa-regular fa-clock me-1"></i>${n.date}</span>
+            </div>
+            <span class="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-1 rounded"><i class="fa-solid fa-user me-1 text-slate-400"></i>${n.author}</span>
+          </div>
+
+          <div>
+            <h3 class="card-title font-bold text-slate-900 leading-snug">${n.title}</h3>
+            <p class="text-slate-700 leading-relaxed mt-2 whitespace-pre-line">${n.body}</p>
+          </div>
+
+          ${isAdmin ? `
+            <div class="pt-3 border-t border-slate-100 flex justify-end">
+              <button onclick="deleteNotice('${n.id}')" class="text-rose-600 hover:text-rose-800 text-xs font-bold flex items-center gap-1 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg border border-rose-200 transition">
+                <i class="fa-solid fa-trash-can"></i> Slet opslag
+              </button>
+            </div>
+          ` : ''}
+        </article>
+      `).join('');
+    }
+
+    function createNotice(e) {
+      e.preventDefault();
+      if (!isAdmin) return;
+
+      const title = document.getElementById('post-title').value;
+      const category = document.getElementById('post-category').value;
+      const author = document.getElementById('post-author').value;
+      const body = document.getElementById('post-body').value;
+      const pinned = document.getElementById('post-pinned').checked;
+      const push = document.getElementById('post-push').checked;
+
+      const now = new Date();
+      const dateStr = now.getDate() + '. ' + ['januar', 'februar', 'marts', 'april', 'maj', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'december'][now.getMonth()] + ' ' + now.getFullYear();
+
+      const newNotice = {
+        id: Date.now().toString(),
+        title,
+        category,
+        author,
+        date: dateStr,
+        pinned,
+        body
+      };
+
+      notices.unshift(newNotice);
+      saveData();
+      renderNotices();
+
+      document.getElementById('notice-form').reset();
+      document.getElementById('post-author').value = "Bestyrelsen";
+
+      if (push) {
+        showPushNotification("NYT OPSLAG: " + title, body, category);
+      }
+    }
+
+    function deleteNotice(id) {
+      if (!isAdmin) return;
+      if (confirm("Er du sikker på, at du vil slette dette opslag permanent?")) {
+        notices = notices.filter(n => n.id !== id);
+        saveData();
+        renderNotices();
+      }
+    }
+
+    function showPushNotification(title, body, category) {
+      const container = document.getElementById('push-toast-container');
+      const toast = document.createElement('div');
+      toast.className = "pointer-events-auto bg-slate-900 text-white p-4 rounded-2xl shadow-2xl border border-slate-700 flex items-start gap-3 toast-enter";
+
+      let icon = 'fa-bell';
+      if (category === 'vigtigt') icon = 'fa-triangle-exclamation text-rose-400';
+      else if (category === 'arrangement') icon = 'fa-cake-candles text-purple-400';
+      else if (category === 'vedligehold') icon = 'fa-wrench text-amber-400';
+
+      toast.innerHTML = `
+        <div class="bg-blue-600 p-2.5 rounded-xl text-white text-lg shrink-0">
+          <i class="fa-solid ${icon}"></i>
+        </div>
+        <div class="flex-grow min-w-0">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">Push-Meddelelse</span>
+            <span class="text-[10px] text-slate-400">Lige nu</span>
+          </div>
+          <h4 class="font-bold text-sm text-white truncate mt-0.5">${title}</h4>
+          <p class="text-xs text-slate-300 line-clamp-2 mt-1 leading-normal">${body}</p>
+        </div>
+        <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-white p-1 text-xs">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      `;
+
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('toast-enter-active');
+      }, 10);
+
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); 
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1); 
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.35);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.35);
+      } catch(e) {}
+
+      setTimeout(() => {
+        if (toast.parentElement) {
+          toast.classList.remove('toast-enter-active');
+          toast.classList.add('toast-exit');
+          setTimeout(() => toast.remove(), 300);
+        }
+      }, 6000);
+    }
+
+    window.onload = initData;
+  </script>
+</body>
+</html>
