@@ -1,12 +1,3 @@
-// Udfyldes efter opsætning af Firebase (se OPSÆTNING.md). Intet her er hemmeligt.
-window.KONFIG = {
-  firebase: { apiKey:"", authDomain:"", projectId:"", messagingSenderId:"", appId:"" },
-  vapidKey: "",
-  apiUrl: ""   // adressen på funktionen "api", som Firebase udskriver ved deploy
-};
-= initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyBD3dwt-hSt3BEm2ufvc-3hwdBW-1sQvIQ",
