@@ -439,8 +439,8 @@ rolle();
 let redMails=[];
 function visRedMails(){
   $("lhjaelp").textContent=redMails.length
-    ?"Kun redaktører kan oprette opslag. Vil du have et opslag oprettet, så send det på mail til en af redaktørerne:"
-    :"Kun redaktører kan oprette opslag. Vil du have et opslag oprettet, så kontakt en af redaktørerne.";
+    ?"Kun redaktører kan oprette opslag. Vil du have et opslag oprettet, så send det på mail til en redaktør:"
+    :"Kun redaktører kan oprette opslag. Vil du have et opslag oprettet, så kontakt en redaktører.";
   $("lmail").replaceChildren(...redMails.map(m=>{const a=el("a","mail","✉️ "+m);a.href="mailto:"+encodeURIComponent(m).replace(/%40/g,"@");return a}));
 }
 firebase.firestore().collection("indstillinger").doc("redaktorer").onSnapshot(d=>{
