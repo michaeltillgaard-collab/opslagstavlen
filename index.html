@@ -183,7 +183,10 @@ footer{text-align:center;font-size:.75rem;color:#64748b;padding:1.5rem 1rem}
  <h2 style="margin-top:0">Redaktører og log</h2>
  <h3>Redaktører</h3><div id="sred"></div>
  <h3>Tilføj redaktør</h3>
- <label for="semail">E-mailadresse</label><input type="email" id="semail">
+<label for="snavn">Navn (vises for beboerne)</label>
+<input type="text" id="snavn" maxlength="60" placeholder="fx Lars Hansen">
+<label for="semail">E-mailadresse (bruges til login, vises ikke)</label>
+<input type="email" id="semail">
  <label class="chk"><input type="checkbox" id="ssyn" checked> Vis e-mailadressen på login-siden, så beboere kan kontakte redaktøren (aftal det med personen)</label>
  <label class="chk"><input type="checkbox" id="sadm"> Må også styre redaktører og se loggen (administrator)</label>
  <p class="fejl" id="stfejl" role="status"></p>
@@ -384,8 +387,11 @@ async function styrData(){
     if(r.status===401)return udlogget();
     if(!r.ok)throw 0;
     const d=await r.json();
-    $("sred").replaceChildren(...d.redaktorer.map(x=>{
-      const rk=el("div","lr");rk.append(el("b","",x.email),el("span","",(x.rolle==="admin"?" (administrator)":" (redaktør)")+(x.synlig?" – vises i kontaktlisten":"")));
+    $("sred").replaceChildren(...d.redaktorer.map(x => {
+  const rk = el("div", "lr");
+  const navn = x.navn ? x.navn + " " : "";
+  rk.append(el("b", "", navn + "(" + x.email + ")"));
+  rk.append(el("span", "", (x.rolle === "admin" ? " – administrator" : " – redaktør") + (x.synlig ? " – vises i kontaktlisten" : "")));
       const sb=el("button","lys",x.synlig?"Skjul i liste":"Vis i liste");sb.type="button";sb.style.cssText="margin-left:.6rem;min-height:2.2rem;font-size:.75rem";
       sb.onclick=async()=>{try{const r=await api({handling:"redSynlig",uid:x.uid,synlig:!x.synlig});if(!r.ok)throw 0;styrData()}catch(e){$("stfejl").textContent="Kunne ikke ændre."}};
       rk.append(sb);
@@ -402,18 +408,29 @@ async function fjernRed(x){
 }
 $("kadm").onclick=()=>{$("stfejl").textContent="";$("styr").showModal();styrData()};
 $("slukD").onclick=()=>$("styr").close();
-$("stilf").onclick=async()=>{
-  const m=$("semail").value.trim().toLowerCase();
-  if(!m){$("stfejl").textContent="Skriv en e-mailadresse.";return}
-  $("stfejl").textContent="Tilføjer …";
-  try{
-    const r=await api({handling:"redTilfoej",email:m,admin:$("sadm").checked,synlig:$("ssyn").checked});
-    if(r.status===409){$("stfejl").textContent="Adressen er allerede redaktør.";return}
-    if(!r.ok)throw 0;
-    await auth.sendPasswordResetEmail(m,{url:SIDEURL});
-    $("semail").value="";$("sadm").checked=false;
-    $("stfejl").textContent="Tilføjet. Der er sendt en mail til "+m+" med et link til at vælge adgangskode.";styrData();
-  }catch(x){$("stfejl").textContent="Kunne ikke tilføje. Tjek e-mailadressen, og prøv igen."}
+$("stilf").onclick = async () => {
+  const navn = $("snavn").value.trim();
+  const m = $("semail").value.trim().toLowerCase();
+  if (!navn) { $("stfejl").textContent = "Skriv et navn."; return; }
+  if (!m) { $("stfejl").textContent = "Skriv en e-mailadresse."; return; }
+  $("stfejl").textContent = "Tilføjer …";
+  try {
+    const r = await api({
+      handling: "redTilfoej",
+      navn,
+      email: m,
+      admin: $("sadm").checked,
+      synlig: $("ssyn").checked,
+    });
+    if (r.status === 409) { $("stfejl").textContent = "Adressen er allerede redaktør."; return; }
+    if (!r.ok) throw 0;
+    await auth.sendPasswordResetEmail(m, { url: SIDEURL });
+    $("snavn").value = ""; $("semail").value = ""; $("sadm").checked = false;
+    $("stfejl").textContent = "Tilføjet. Der er sendt en mail til " + m + " med et link til at vælge adgangskode.";
+    styrData();
+  } catch (x) {
+    $("stfejl").textContent = "Kunne ikke tilføje. Tjek e-mailadressen, og prøv igen.";
+  }
 };
 $("udgiv").onclick=async()=>{
   const harD=$("harD").checked;
@@ -438,15 +455,35 @@ async function slet(id){
 rolle();
 
 /* Kontaktliste over redaktører (vises i login-vinduet) */
-let redMails=[];
-function visRedMails(){
-  $("lhjaelp").textContent=redMails.length
-    ?"Kun redaktører kan oprette opslag. Vil du have et opslag oprettet, så send det på mail til en redaktør:"
-    :"Kun redaktører kan oprette opslag. Vil du have et opslag oprettet, så kontakt en redaktør.";
-  $("lmail").replaceChildren(...redMails.map(m=>{const a=el("a","mail","✉️ "+m);a.href="mailto:"+encodeURIComponent(m).replace(/%40/g,"@");return a}));
+let redListe = [];
+function visRedMails() {
+  $("lhjaelp").textContent = redListe.length
+    ? "Kun redaktører kan oprette opslag. Vil du have et opslag oprettet, så kontakt en redaktør:"
+    : "Kun redaktører kan oprette opslag. Vil du have et opslag oprettet, så kontakt en redaktør.";
+  $("lmail").replaceChildren(
+    ...redListe.map((r) => {
+      const a = el("a", "mail", "✉️ " + (r.navn || r.email));
+      a.href = "mailto:" + encodeURIComponent(r.email).replace(/%40/g, "@");
+      a.title = "Skriv til " + (r.navn || r.email);
+      return a;
+    })
+  );
 }
-firebase.firestore().collection("indstillinger").doc("redaktorer").onSnapshot(d=>{
-  redMails=d.exists&&Array.isArray(d.data().emails)?d.data().emails:[];visRedMails()},()=>{});
+firebase.firestore().collection("indstillinger").doc("redaktorer").onSnapshot(
+  (d) => {
+    const data = d.exists ? d.data() : {};
+    // Bagudkompatibilitet: hvis der stadig ligger "emails" fra før, brug dem
+    if (Array.isArray(data.liste)) {
+      redListe = data.liste;
+    } else if (Array.isArray(data.emails)) {
+      redListe = data.emails.map((e) => ({ navn: e.split("@")[0], email: e }));
+    } else {
+      redListe = [];
+    }
+    visRedMails();
+  },
+  () => {}
+);
 visRedMails();
 
 /* Kontaktside */
