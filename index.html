@@ -266,9 +266,26 @@ const obs="IntersectionObserver" in window?new IntersectionObserver(es=>es.forEa
   if(e.isIntersecting){timere.set(a,setTimeout(()=>{sete[a.dataset.id]=+a.dataset.ver;gemSete()},1500))}
   else{clearTimeout(timere.get(a));timere.delete(a)}}),{threshold:.15}):null;
 function marker(){
-  opslag.forEach(o=>{const k=nok(o);if(!(k in markering)){const v=sete[o.id];markering[k]=v===undefined?"NYT":(ver(o)>v?"RETTET":"")}});
-  const n=opslag.filter(o=>markering[nok(o)]).length;
-  $("nye").hidden=!n;$("nye").textContent="🆕 "+n+(n===1?" nyt opslag":" nye opslag")+" – tryk for at se";
+  // Beregn grænsen for, hvornår et opslag må markeres som "nyt" (7 dage tilbage)
+  const graense = Date.now() - 7 * 24 * 60 * 60 * 1000;
+
+  opslag.forEach(o => {
+    const k = nok(o);
+    if (!(k in markering)) {
+      const v = sete[o.id];
+      // Hvis opslaget er ældre end 7 dage og ikke er set før, skal det ikke markeres som nyt
+      const oprettetTid = o.oprettet && o.oprettet.toMillis ? o.oprettet.toMillis() : 0;
+      if (v === undefined) {
+        markering[k] = (oprettetTid > graense) ? "NYT" : "";
+      } else {
+        markering[k] = (ver(o) > v) ? "RETTET" : "";
+      }
+    }
+  });
+
+  const n = opslag.filter(o => markering[nok(o)]).length;
+  $("nye").hidden = !n;
+  $("nye").textContent = "🆕 " + n + (n === 1 ? " nyt opslag" : " nye opslag") + " – tryk for at se";
 }
 
 async function api(b){
@@ -284,7 +301,19 @@ const dato=ts=>ts?ts.toDate().toLocaleDateString("da-DK",{day:"numeric",month:"l
 firebase.initializeApp(K.firebase);
 firebase.firestore().collection("opslag").orderBy("oprettet","desc").limit(200).onSnapshot(s=>{
   opslag=s.docs.map(d=>({id:d.id,...d.data()}));
-  if(foerste&&!baseret){baseret=true;opslag.forEach(o=>{sete[o.id]=ver(o)});gemSete()}
+    if(foerste&&!baseret){
+    baseret=true;
+    const nu7 = Date.now();
+    const graense7 = nu7 - 7 * 24 * 60 * 60 * 1000;
+    opslag.forEach(o => {
+      const oprettetTid = o.oprettet && o.oprettet.toMillis ? o.oprettet.toMillis() : 0;
+      // Kun opslag ældre end 7 dage markeres som "set" fra starten
+      if (oprettetTid < graense7) {
+        sete[o.id] = ver(o);
+      }
+    });
+    gemSete();
+  }
   $("opd").innerHTML='<span class="dot"></span>Live';
   vis();
 },()=>{$("opd").innerHTML='<span class="dot off"></span>Ingen forbindelse';
