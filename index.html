@@ -232,7 +232,17 @@ footer{text-align:center;font-size:.75rem;color:#64748b;padding:1.5rem 1rem}
  <p>Version 1.4 – 10. november 2026</p>
  <button type="button" id="privatluk" style="width:100%;margin-top:1rem">Luk</button>
 </dialog>
-
+<dialog id="sletbekraeft">
+ <h2 style="margin-top:0">Slet opslag</h2>
+ <p>Er du sikker på, at du vil slette dette opslag? Det kan ikke fortrydes.</p>
+ <label for="sletord">Skriv <b>SLET</b> for at bekræfte:</label>
+ <input type="text" id="sletord" autocomplete="off" style="text-transform:uppercase">
+ <p class="fejl" id="sletfejl" role="status"></p>
+ <div class="rk">
+  <button type="button" class="lys" id="sletannuller">Annullér</button>
+  <button type="button" class="fare" id="sletja" disabled>Slet opslag</button>
+ </div>
+</dialog>
 <dialog id="foto"><img id="stor" alt=""><button type="button" id="luk" style="width:100%">Luk</button></dialog>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -462,11 +472,42 @@ $("udgiv").onclick=async()=>{
   }catch(x){$("afejl").textContent="Opslaget blev ikke udgivet. Prøv igen."}
   $("udgiv").disabled=false;
 };
-async function slet(id){
-  if(!confirm("Er du sikker på, at du vil slette opslaget?"))return;
-  try{const r=await api({handling:"slet",id});if(r.status===401)return udlogget();if(!r.ok)throw 0}
-  catch(x){alert("Opslaget blev ikke slettet. Prøv igen.")}
+let sletId = null;
+
+function slet(id) {
+  sletId = id;
+  $("sletord").value = "";
+  $("sletfejl").textContent = "";
+  $("sletja").disabled = true;
+  $("sletbekraeft").showModal();
+  // Sæt fokus på inputfeltet, så man kan skrive med det samme
+  setTimeout(() => $("sletord").focus(), 100);
 }
+
+$("sletord").addEventListener("input", () => {
+  const ok = $("sletord").value.trim().toUpperCase() === "SLET";
+  $("sletja").disabled = !ok;
+});
+
+$("sletannuller").onclick = () => {
+  $("sletbekraeft").close();
+  sletId = null;
+};
+
+$("sletja").onclick = async () => {
+  if (!sletId) return;
+  $("sletja").disabled = true;
+  $("sletfejl").textContent = "Sletter …";
+  try {
+    const r = await api({ handling: "slet", id: sletId });
+    if (r.status === 401) return udlogget();
+    if (!r.ok) throw 0;
+    $("sletbekraeft").close();
+    sletId = null;
+  } catch (x) {
+    $("sletfejl").textContent = "Opslaget blev ikke slettet. Prøv igen.";
+  }
+};
 rolle();
 
 /* Kontaktliste over redaktører (vises i login-vinduet) */
