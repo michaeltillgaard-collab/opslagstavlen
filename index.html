@@ -68,6 +68,19 @@ button.lnk{background:none;color:var(--hav);text-decoration:underline;min-height
 .lr{font-size:.8rem;border-bottom:1px solid #e2e8f0;padding:.35rem 0;overflow-wrap:anywhere}#styr{max-width:40rem;max-height:90vh;overflow:auto}#styr h3{font-size:1rem;margin:1rem 0 .3rem}
 #lfejl:empty{display:none}
 a.mail{display:block;padding:.45rem 0;font-weight:700;overflow-wrap:anywhere;color:var(--link)}
+ /* Tilpasning når telefonen holdes i liggende stilling (landscape) */
+@media (orientation: landscape) and (max-height: 600px) {
+  header .in { padding: .3rem 1rem; }
+  .logo img { width: 2rem; height: 2rem; border-radius: .4rem; }
+  h1 { font-size: 1rem; }
+  header small { display: none; }          /* Skjul adresselinjen */
+  .sub { display: none; }                  /* Skjul "Visning: Beboer"-linjen */
+  main { padding: .5rem 1rem; }
+  .bar { margin-bottom: .5rem; gap: .4rem; }
+  .fane button { min-height: 2.4rem; font-size: .95rem; }
+  article { margin: .6rem 0; padding: .8rem 1rem; }
+  article h3 { font-size: 1.2rem; }
+}
 footer{text-align:center;font-size:.75rem;color:#64748b;padding:1.5rem 1rem}
 </style></head><body>
 <header>
