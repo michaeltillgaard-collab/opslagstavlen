@@ -49,8 +49,9 @@ dialog{border:0;border-radius:1rem;padding:1.3rem;max-width:26rem;width:92%}dial
 .fejl{color:#b91c1c;font-size:.85rem;min-height:1.2rem}
 .status:empty{display:none}
 #pushbar:not(:has(button:not([hidden]),.panel:not([hidden]),.status:not(:empty))){display:none}
-.arr{background:#eff6ff;border:2px solid #93c5fd;border-radius:.8rem;padding:.7rem .9rem;margin:.7rem 0;font-weight:700;font-size:1.05rem}
-.arr.forbi{background:#f1f5f9;border-color:#cbd5e1;color:#475569}.arr .sted{font-weight:600;font-size:.95rem;margin-top:.2rem}.arr .kal{margin-top:.6rem;width:100%}
+.arr{background:#eff6ff;border:2px solid #93c5fd;border-radius:.8rem;padding:.7rem .9rem;margin:.7rem 0;font-weight:700;font-size:1.05rem;display:flex;flex-direction:column}
+.arr.forbi{background:#f1f5f9;border-color:#cbd5e1;color:#475569}.arr .sted{font-weight:600;font-size:.95rem;margin-top:.2rem}.arr .kal{margin-top:.6rem;width:auto;align-self:flex-start;font-size:.95rem;min-height:2.6rem;padding:.3rem 1rem;background:#fff;color:var(--hav);border:2px solid #93c5fd}
+.arr .kal:hover{background:#eff6ff}
 #dbox{background:#fff;border:1px solid #fcd34d;border-radius:.6rem;padding:.2rem .8rem .8rem;margin-top:.4rem}
 .nyt{display:inline-block;background:#dc2626;color:#fff;font-size:.75rem;font-weight:800;padding:.05rem .6rem;border-radius:1rem;margin-right:.5rem;letter-spacing:.03em}
 .nyt.rettet{background:#d97706}article.ny{box-shadow:0 0 0 3px #fecaca}article{scroll-margin-top:8rem}#nye{width:100%}
@@ -563,7 +564,7 @@ function arrBox(o){
   const b=el("div","arr"+(forbi?" forbi":""));
   b.append(el("div","",(forbi?"✔️ Afholdt: ":"📅 ")+t));
   if(r.sted)b.append(el("div","sted","📍 "+r.sted));
-  if(!forbi){const k=el("button","kal","📅 Tilføj til kalender");k.onclick=()=>ics(o);b.append(k)}
+    if(!forbi){const k=el("button","kal lys2","📅 Tilføj til kalender");k.onclick=()=>ics(o);b.append(k)}
   return b}
 function ics(o){
   const r=o.arrangement,e=x=>String(x||"").replace(/\\/g,"\\\\").replace(/[;,]/g,"\\$&").replace(/\r?\n/g,"\\n"),
