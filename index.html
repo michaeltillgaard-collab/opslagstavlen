@@ -558,14 +558,33 @@ function visD(){$("dbox").hidden=!$("harD").checked}
 $("harD").onchange=visD;
 const idag=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 function arrBox(o){
-  const r=o.arrangement,d=new Date(r.dato+"T12:00:00"),forbi=r.dato<idag();
+  const r=o.arrangement,d=new Date(r.dato+"T12:00:00");
+  
+  // Beregn om arrangementet er afholdt (dato + evt. tidspunkt)
+  let forbi;
+  if(r.tid){
+    // Hvis der er et tidspunkt, er arrangementet "forbi" 1 time efter starttidspunktet
+    const start=new Date(r.dato+"T"+r.tid+":00");
+    forbi=start.getTime()+3600000 < Date.now();
+  }else{
+    // Uden tidspunkt: arrangementet er forbi, når dagen er ovre
+    forbi=r.dato<idag();
+  }
+  
   let t=d.toLocaleDateString("da-DK",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
   t=t.charAt(0).toUpperCase()+t.slice(1)+(r.tid?" kl. "+r.tid.replace(":","."):"");
   const b=el("div","arr"+(forbi?" forbi":""));
   b.append(el("div","dato",(forbi?"✔️ Afholdt: ":"📅 ")+t));
   if(r.sted)b.append(el("div","sted","📍 "+r.sted));
-    if(!forbi){const k=el("button","kal lys2","📅 Tilføj til kalender");k.onclick=()=>ics(o);b.append(k)}
-  return b}
+  
+  // Vis kun kalenderknappen, hvis arrangementet IKKE er afholdt
+  if(!forbi){
+    const k=el("button","kal lys2","📅 Tilføj til kalender");
+    k.onclick=()=>ics(o);
+    b.append(k);
+  }
+  return b;
+}
 function ics(o){
   const r=o.arrangement,e=x=>String(x||"").replace(/\\/g,"\\\\").replace(/[;,]/g,"\\$&").replace(/\r?\n/g,"\\n"),
     p2=n=>String(n).padStart(2,"0"),ymd=x=>x.getFullYear()+p2(x.getMonth()+1)+p2(x.getDate()),
