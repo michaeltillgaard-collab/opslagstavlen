@@ -407,7 +407,7 @@ function vis(){
     a.dataset.id=o.id;a.dataset.ver=ver(o);
     if(o.fastgjort)a.append(el("div","pt","📌 Fastgjort"));
     const m=el("div","meta");
-    m.append(el("span","badge",(KAT[o.kategori]||KAT.info)+" · "+dato(o.oprettet)+(o.redigeret?" (rettet "+dato(o.redigeret)+")":"")),el("span","","Fra: "+(o.afsender||"")));
+    m.append(el("span","badge",(KAT[o.kategori]||KAT.info)+" · oprettet d. "+dato(o.oprettet)+(o.redigeret?" (rettet d. "+dato(o.redigeret)+")":"")),el("span","","Fra: "+(o.afsender||"")));
     if(mk)m.firstChild.prepend(el("span","nyt"+(mk==="RETTET"?" rettet":""),mk));
     a.append(m,el("h3","",o.titel));
     a.append(el("p","",o.tekst));
