@@ -423,7 +423,7 @@ async function styrData(){
       if(!bruger||x.email!==bruger.email.toLowerCase()){const b=el("button","fare","Fjern");b.type="button";b.style.marginLeft=".6rem";b.onclick=()=>fjernRed(x);rk.append(b)}
       return rk}));
     $("slog").replaceChildren(...(d.log.length?d.log.map(x=>el("div","lr",
-      new Date(x.tid).toLocaleString("da-DK",{dateStyle:"short",timeStyle:"short"})+" – "+x.email+" "+(HAND[x.handling]||x.handling)+(x.detalje?": "+x.detalje:""))):[el("p","status","Ingen log endnu.")]));
+      new Date(x.tid).toLocaleString("da-DK",{dateStyle:"short",timeStyle:"short"})+" – "+(x.navn||x.email)+" "+(HAND[x.handling]||x.handling)+(x.detalje?": "+x.detalje:""))):[el("p","status","Ingen log endnu.")]));
   }catch(x){$("sred").textContent="Kunne ikke hente. Prøv igen."}
 }
 async function fjernRed(x){
