@@ -323,7 +323,21 @@ function udvalg(){
   const q=$("s").value.toLowerCase();
   return opslag.filter(o=>(filter==="alle"||o.kategori===filter)&&
     [o.titel,o.tekst,o.afsender].some(x=>(x||"").toLowerCase().includes(q)))
-    .sort((a,b)=>(b.fastgjort?1:0)-(a.fastgjort?1:0));
+    .sort((a,b)=>{
+      // 1. Fastgjorte opslag kommer først
+      const fast = (b.fastgjort?1:0) - (a.fastgjort?1:0);
+      if (fast !== 0) return fast;
+      
+      // 2. Ellers sorteres de efter 'raekkefoelge' (hvis den findes)
+      const r1 = a.raekkefoelge !== undefined ? a.raekkefoelge : 0;
+      const r2 = b.raekkefoelge !== undefined ? b.raekkefoelge : 0;
+      if (r1 !== r2) return r2 - r1; // Højere tal = øverst
+      
+      // 3. Hvis de har samme rækkefølge, sorteres de efter oprettelsesdato
+      const d1 = a.oprettet && a.oprettet.toMillis ? a.oprettet.toMillis() : 0;
+      const d2 = b.oprettet && b.oprettet.toMillis ? b.oprettet.toMillis() : 0;
+      return d2 - d1;
+    });
 }
 function pager(n){
   $("pager").hidden=n<2;if(n<2)return;
@@ -353,8 +367,25 @@ function vis(){
     if(bl.length){const g=el("div","fotos");bl.forEach(x=>{const i=document.createElement("img");
       i.src=x.url;i.loading="lazy";i.alt="Billede til opslaget: "+(o.titel||"");
       i.onclick=()=>{$("stor").src=x.url;$("stor").alt=i.alt;$("foto").showModal()};g.append(i)});a.append(g)}
-    if(kode){const d=el("div","slet"),r=el("button","ret","✏️ Ret opslag"),b=el("button","fare","🗑 Slet opslag");
-      r.onclick=()=>startRet(o);b.onclick=()=>slet(o.id);d.append(r,b);a.append(d)}
+    if(kode){
+      const d=el("div","slet");
+      
+      // Flyt-knapper
+      const op=el("button","lys","⬆️ Flyt op");
+      const ned=el("button","lys","⬇️ Flyt ned");
+      op.onclick=()=>flytOpslag(o.id,"op");
+      ned.onclick=()=>flytOpslag(o.id,"ned");
+      d.append(op,ned);
+      
+      // Ret og slet
+      const r=el("button","ret","✏️ Ret opslag");
+      const b=el("button","fare","🗑 Slet opslag");
+      r.onclick=()=>startRet(o);
+      b.onclick=()=>slet(o.id);
+      d.append(r,b);
+      
+      a.append(d);
+    }
     return a;
   }));
   if(obs){obs.disconnect();l.querySelectorAll("article").forEach(a=>obs.observe(a))}
@@ -538,7 +569,15 @@ $("sletja").onclick = async () => {
   }
 };
 rolle();
-
+async function flytOpslag(id, retning) {
+  try {
+    const r = await api({ handling: "flyt", id, retning });
+    if (r.status === 401) return udlogget();
+    if (!r.ok) throw 0;
+  } catch (x) {
+    alert("Kunne ikke flytte opslaget. Prøv igen.");
+  }
+}
 /* Kontaktliste over redaktører (vises i login-vinduet) */
 let redListe = [];
 function visRedMails() {
