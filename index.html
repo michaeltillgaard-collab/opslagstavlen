@@ -183,6 +183,7 @@ footer{text-align:center;font-size:.75rem;color:#64748b;padding:1.5rem 1rem}
   <input type="file" id="fil" accept="image/*" multiple>
   <div class="prev" id="prev"></div>
   <label class="chk"><input type="checkbox" id="f"> 📌 Fastgør øverst</label>
+  <label class="chk"><input type="checkbox" id="ark"> 📦 Gem i arkiv (skjules fra den aktive liste)</label>
   <label class="chk"><input type="checkbox" id="p" checked> 🔔 Send push-besked til beboerne</label>
   <p class="fejl" id="afejl" role="status"></p>
   <button id="udgiv" class="rav" style="width:100%">Udgiv opslag</button>
@@ -193,7 +194,12 @@ footer{text-align:center;font-size:.75rem;color:#64748b;padding:1.5rem 1rem}
   <button id="nye" class="rav" hidden></button>
   <input type="search" id="s" placeholder="Søg i opslag …" aria-label="Søg i opslag">
   <div class="chips" id="chips">
-   <button data-f="alle" class="on">Alle</button><button data-f="vigtigt">🚨 Vigtigt</button><button data-f="arrangement">🎉 Arrangement</button><button data-f="vedligehold">🛠️ Drift</button><button data-f="info">📢 Info</button>
+  <button data-f="alle" class="on">Alle</button>
+  <button data-f="vigtigt">🚨 Vigtigt</button>
+  <button data-f="arrangement">🎉 Arrangement</button>
+  <button data-f="vedligehold">🛠️ Drift</button>
+  <button data-f="info">📢 Info</button>
+  <button data-f="arkiv">📦 Arkiv</button>
   </div>
  </div>
  <div id="liste"><p class="status">Henter opslag …</p></div>
@@ -379,26 +385,30 @@ firebase.firestore().collection("opslag").orderBy("oprettet","desc").limit(200).
 
 function udvalg(){
   const q=$("s").value.toLowerCase();
-  return opslag.filter(o=>(filter==="alle"||o.kategori===filter)&&
-    [o.titel,o.tekst,o.afsender].some(x=>(x||"").toLowerCase().includes(q)))
-        .sort((a,b)=>{
-      // 1. Fastgjorte opslag kommer først
-      const fast = (b.fastgjort?1:0) - (a.fastgjort?1:0);
-      if (fast !== 0) return fast;
-      
-      // 2. Sortering efter 'raekkefoelge'
-      // Hvis et opslag ikke har en rækkefølge (f.eks. et helt nyt opslag), 
-      // giver vi det en meget høj værdi, så det kommer øverst.
-      const r1 = a.raekkefoelge !== undefined ? a.raekkefoelge : 999999;
-      const r2 = b.raekkefoelge !== undefined ? b.raekkefoelge : 999999;
-      
-      if (r1 !== r2) return r2 - r1; // Højere tal = øverst
-      
-      // 3. Hvis de har samme rækkefølge (eller begge er nye), sorteres de efter oprettelsesdato
-      const d1 = a.oprettet && a.oprettet.toMillis ? a.oprettet.toMillis() : 0;
-      const d2 = b.oprettet && b.oprettet.toMillis ? b.oprettet.toMillis() : 0;
-      return d2 - d1;
-    });
+  return opslag.filter(o => {
+    // Hvis filteret er "arkiv", vis KUN arkiverede opslag
+    if (filter === "arkiv") {
+      return o.arkiveret === true &&
+        [o.titel,o.tekst,o.afsender].some(x=>(x||"").toLowerCase().includes(q));
+    }
+    
+    // Ellers: Vis kun aktive opslag, der matcher filter og søgning
+    return o.arkiveret !== true &&
+      (filter==="alle"||o.kategori===filter) &&
+      [o.titel,o.tekst,o.afsender].some(x=>(x||"").toLowerCase().includes(q));
+  })
+  .sort((a,b)=>{
+    const fast = (b.fastgjort?1:0) - (a.fastgjort?1:0);
+    if (fast !== 0) return fast;
+    
+    const r1 = a.raekkefoelge !== undefined ? a.raekkefoelge : 999999;
+    const r2 = b.raekkefoelge !== undefined ? b.raekkefoelge : 999999;
+    if (r1 !== r2) return r2 - r1;
+    
+    const d1 = a.oprettet && a.oprettet.toMillis ? a.oprettet.toMillis() : 0;
+    const d2 = b.oprettet && b.oprettet.toMillis ? b.oprettet.toMillis() : 0;
+    return d2 - d1;
+  });
 }
 function pager(n){
   $("pager").hidden=n<2;if(n<2)return;
@@ -418,6 +428,7 @@ function vis(){
     const mk=markering[nok(o)],a=el("article",(o.fastgjort?"pin ":"")+(mk?"ny ":"")+"k-"+(o.kategori||"info"));
     a.dataset.id=o.id;a.dataset.ver=ver(o);
     if(o.fastgjort)a.append(el("div","pt","📌 Fastgjort"));
+    if(o.arkiveret)a.append(el("div","pt","📦 Arkiveret"));
     const m=el("div","meta");
     m.append(el("span","badge",(KAT[o.kategori]||KAT.info)+" · oprettet d. "+dato(o.oprettet)+(o.redigeret?" (rettet d. "+dato(o.redigeret)+")":"")),el("span","","Fra: "+(o.afsender||"")));
     if(mk)m.firstChild.prepend(el("span","nyt"+(mk==="RETTET"?" rettet":""),mk));
@@ -586,8 +597,14 @@ $("stilf").onclick = async () => {
 };
 $("udgiv").onclick=async()=>{
   const harD=$("harD").checked;
-  const b={handling:redigerId?"ret":"opret",dato:harD?$("ad").value:"",tid:harD?$("at").value:"",sted:harD?$("as").value.trim():"",titel:$("t").value.trim(),tekst:$("b").value.trim(),afsender:$("a").value.trim(),
-    kategori:$("k").value,fastgjort:$("f").checked,push:$("p").checked,billeder:valgte};
+  const b={
+    handling:redigerId?"ret":"opret",
+    // ... (resten er uændret)
+    fastgjort:$("f").checked,
+    arkiveret:$("ark").checked, // <-- NYT
+    push:$("p").checked,
+    billeder:valgte
+  };
   if(redigerId){b.id=redigerId;b.behold=eksist.map(x=>x.sti)}
   if(!b.titel||!b.tekst||!b.afsender){$("afejl").textContent="Udfyld overskrift, afsender og besked.";return}
   if(harD&&!b.dato){$("afejl").textContent="Vælg en dato, eller fjern fluebenet ved dato.";return}
@@ -800,13 +817,21 @@ function ics(o){
 function startRet(o){
   redigerId=o.id;eksist=(o.billeder||[]).filter(x=>x&&x.sti&&x.url);valgte=[];
   $("t").value=o.titel||"";$("b").value=o.tekst||"";$("a").value=o.afsender||"";$("k").value=o.kategori||"info";
-  $("f").checked=!!o.fastgjort;$("p").checked=false;
+  $("f").checked=!!o.fastgjort;
+  $("ark").checked=!!o.arkiveret; // <-- NYT
+  $("p").checked=false;
   const ar=o.arrangement;$("harD").checked=!!ar;$("ad").value=ar?ar.dato:"";$("at").value=ar&&ar.tid?ar.tid:"";$("as").value=ar&&ar.sted?ar.sted:"";visD();
   $("ah").textContent="Ret opslag";$("udgiv").textContent="Gem ændringer";$("annuller2").hidden=false;
   $("afejl").textContent="";prev();$("admin").scrollIntoView({behavior:"smooth"});
 }
 function stopRet(){
-  redigerId=null;eksist=[];valgte=[];$("t").value="";$("a").value="";$("b").value="";$("f").checked=false;$("p").checked=true;
+  redigerId=null;eksist=[];valgte=[];
+  $("t").value="";
+  $("a").value="";
+  $("b").value="";  
+  $("f").checked=false;
+  $("ark").checked=false; // <-- NYT
+  $("p").checked=true;
   $("harD").checked=false;$("ad").value="";$("at").value="";$("as").value="";visD();
   $("ah").textContent="Opret nyt opslag (kun redaktører)";$("udgiv").textContent="Udgiv opslag";$("annuller2").hidden=true;prev();
 }
