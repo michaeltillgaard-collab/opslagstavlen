@@ -892,8 +892,9 @@ function side(){
   $("fOpslag").classList.toggle("on",!k);$("fKontakt").classList.toggle("on",k);
   scrollTo(0,0);
 }
-$("fOpslag").onclick=()=>{location.hash="opslag"};
-$("fKontakt").onclick=()=>{location.hash="kontakt"};
+$("fOpslag").onclick = () => { location.hash = "opslag"; };
+$("fAktiviteter").onclick = () => { location.hash = "aktiviteter"; };
+$("fKontakt").onclick = () => { location.hash = "kontakt"; };
 addEventListener("hashchange",side);side();
 
 /* Billeder: forkleinelse i browseren, så de er hurtige at sende og hente */
