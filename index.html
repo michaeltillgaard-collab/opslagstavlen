@@ -890,6 +890,7 @@ $("kgem").onclick=async()=>{
   }catch(x){$("kfejl").textContent="Kunne ikke gemmes. Prøv igen."}
   $("kgem").disabled=false;
 };
+document.addEventListener("DOMContentLoaded", () => {
 function side(){
   const h = location.hash;
   const k = h === "#kontakt";
@@ -1064,4 +1065,5 @@ if(ios&&!iApp){$("push").hidden=true;$("iosinfo").hidden=false}
 let ip=null;
 addEventListener("beforeinstallprompt",e=>{e.preventDefault();ip=e;$("inst").hidden=false});
 $("inst").onclick=async()=>{if(ip){ip.prompt();await ip.userChoice;ip=null;$("inst").hidden=true}};
+}); // <-- Lukker DOMContentLoaded
 </script></body></html>
