@@ -595,26 +595,53 @@ $("stilf").onclick = async () => {
     $("stfejl").textContent = "Kunne ikke tilføje. Tjek e-mailadressen, og prøv igen.";
   }
 };
-$("udgiv").onclick=async()=>{
-  const harD=$("harD").checked;
-  const b={
-    handling:redigerId?"ret":"opret",
-    // ... (resten er uændret)
-    fastgjort:$("f").checked,
-    arkiveret:$("ark").checked, // <-- NYT
-    push:$("p").checked,
-    billeder:valgte
+$("udgiv").onclick = async () => {
+  const harD = $("harD").checked;
+  const b = {
+    handling: redigerId ? "ret" : "opret",
+    dato: harD ? $("ad").value : "",
+    tid: harD ? $("at").value : "",
+    sted: harD ? $("as").value.trim() : "",
+    titel: $("t").value.trim(),
+    tekst: $("b").value.trim(),
+    afsender: $("a").value.trim(),
+    kategori: $("k").value,
+    fastgjort: $("f").checked,
+    arkiveret: $("ark").checked, // <-- NYT
+    push: $("p").checked,
+    billeder: valgte
   };
-  if(redigerId){b.id=redigerId;b.behold=eksist.map(x=>x.sti)}
-  if(!b.titel||!b.tekst||!b.afsender){$("afejl").textContent="Udfyld overskrift, afsender og besked.";return}
-  if(harD&&!b.dato){$("afejl").textContent="Vælg en dato, eller fjern fluebenet ved dato.";return}
-  $("udgiv").disabled=true;$("afejl").textContent="Udgiver …";
-  try{const r=await api(b);
-    if(r.status===401)return udlogget();
-    if(!r.ok)throw 0;
-    const ret=!!redigerId;stopRet();$("afejl").textContent=ret?"Ændringerne er gemt.":"Opslaget er udgivet.";
-  }catch(x){$("afejl").textContent="Opslaget blev ikke udgivet. Prøv igen."}
-  $("udgiv").disabled=false;
+  
+  if (redigerId) {
+    b.id = redigerId;
+    b.behold = eksist.map(x => x.sti);
+  }
+  
+  if (!b.titel || !b.tekst || !b.afsender) {
+    $("afejl").textContent = "Udfyld overskrift, afsender og besked.";
+    return;
+  }
+  if (harD && !b.dato) {
+    $("afejl").textContent = "Vælg en dato, eller fjern fluebenet ved dato.";
+    return;
+  }
+  
+  $("udgiv").disabled = true;
+  $("afejl").textContent = "Udgiver …";
+  
+  try {
+    const r = await api(b);
+    if (r.status === 401) return udlogget();
+    if (!r.ok) throw 0;
+    
+    const ret = !!redigerId;
+    stopRet();
+    $("afejl").textContent = ret ? "Ændringerne er gemt." : "Opslaget er udgivet.";
+  } catch (x) {
+    $("afejl").textContent = "Opslaget blev ikke udgivet. Prøv igen.";
+  }
+  
+  $("udgiv").disabled = false;
 };
 let sletId = null;
 
