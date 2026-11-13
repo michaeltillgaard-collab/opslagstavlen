@@ -381,17 +381,20 @@ function udvalg(){
   const q=$("s").value.toLowerCase();
   return opslag.filter(o=>(filter==="alle"||o.kategori===filter)&&
     [o.titel,o.tekst,o.afsender].some(x=>(x||"").toLowerCase().includes(q)))
-    .sort((a,b)=>{
+        .sort((a,b)=>{
       // 1. Fastgjorte opslag kommer først
       const fast = (b.fastgjort?1:0) - (a.fastgjort?1:0);
       if (fast !== 0) return fast;
       
-      // 2. Ellers sorteres de efter 'raekkefoelge' (hvis den findes)
-      const r1 = a.raekkefoelge !== undefined ? a.raekkefoelge : 0;
-      const r2 = b.raekkefoelge !== undefined ? b.raekkefoelge : 0;
+      // 2. Sortering efter 'raekkefoelge'
+      // Hvis et opslag ikke har en rækkefølge (f.eks. et helt nyt opslag), 
+      // giver vi det en meget høj værdi, så det kommer øverst.
+      const r1 = a.raekkefoelge !== undefined ? a.raekkefoelge : 999999;
+      const r2 = b.raekkefoelge !== undefined ? b.raekkefoelge : 999999;
+      
       if (r1 !== r2) return r2 - r1; // Højere tal = øverst
       
-      // 3. Hvis de har samme rækkefølge, sorteres de efter oprettelsesdato
+      // 3. Hvis de har samme rækkefølge (eller begge er nye), sorteres de efter oprettelsesdato
       const d1 = a.oprettet && a.oprettet.toMillis ? a.oprettet.toMillis() : 0;
       const d2 = b.oprettet && b.oprettet.toMillis ? b.oprettet.toMillis() : 0;
       return d2 - d1;
