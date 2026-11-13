@@ -369,7 +369,7 @@ footer{text-align:center;font-size:.75rem;color:#64748b;padding:1.5rem 1rem}
 <script>
 const K=window.KONFIG,$=id=>document.getElementById(id);
 const KAT={vigtigt:"🚨 Vigtigt",arrangement:"🎉 Arrangement",vedligehold:"🛠️ Vedligehold",info:"📢 Information"};
-let opslag=[],filter="alle",kode=false,rolleNavn=null,bruger=null,valgte=[],eksist=[],redigerId=null,kontakter=[],kred=null,sideNr=1;
+let opslag=[],filter="alle",kode=false,rolleNavn=null,bruger=null,valgte=[],eksist=[],redigerId=null,kontakter=[],kred=null,sideNr=1, aktiviteter={};
 const PR_SIDE=10;
 /* "Nyt"-markering: husker på denne enhed, hvilke opslag der er set */
 let sete=null;try{const x=localStorage.getItem("sete");sete=x?JSON.parse(x):null}catch(e){}
@@ -799,7 +799,6 @@ function visKontakt(){
   $("kedit").hidden=!kode||kred===null;
 }
 /* Aktiviteter: Hent og vis */
-let aktiviteter = {};
 firebase.firestore().collection("indstillinger").doc("aktiviteter").onSnapshot(d => {
   aktiviteter = d.exists ? d.data() : {};
   visAktiviteter();
