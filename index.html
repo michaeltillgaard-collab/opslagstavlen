@@ -887,15 +887,27 @@ $("kgem").onclick=async()=>{
   $("kgem").disabled=false;
 };
 function side(){
-  const k=location.hash==="#kontakt";
-  $("sideOpslag").hidden=k;$("sideKontakt").hidden=!k;
-  $("fOpslag").classList.toggle("on",!k);$("fKontakt").classList.toggle("on",k);
+  const h = location.hash;
+  const k = h === "#kontakt";
+  const a = h === "#aktiviteter";
+  
+  $("sideOpslag").hidden = k || a;
+  $("sideKontakt").hidden = !k;
+  $("sideAktiviteter").hidden = !a;
+  
+  $("fOpslag").classList.toggle("on", !k && !a);
+  $("fKontakt").classList.toggle("on", k);
+  $("fAktiviteter").classList.toggle("on", a);
+  
   scrollTo(0,0);
 }
+
 $("fOpslag").onclick = () => { location.hash = "opslag"; };
 $("fAktiviteter").onclick = () => { location.hash = "aktiviteter"; };
 $("fKontakt").onclick = () => { location.hash = "kontakt"; };
-addEventListener("hashchange",side);side();
+
+addEventListener("hashchange", side);
+side();
 
 /* Billeder: forkleinelse i browseren, så de er hurtige at sende og hente */
 function komprimer(fil){return new Promise((ok,fejl)=>{
