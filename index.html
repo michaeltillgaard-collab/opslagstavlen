@@ -830,8 +830,11 @@ $("akannul").onclick = () => {
 $("akgem").onclick = async () => {
   const ny = {};
   ["mandag","tirsdag","onsdag","torsdag","fredag","lørdag","søndag","andet"].forEach(d => {
-    const v = $("a-" + d).value.trim();
-    if (v) ny[d] = v;
+    const felt = $("a-" + d);
+    if (felt) {
+      const v = felt.value.trim();
+      if (v) ny[d] = v;
+    }
   });
   
   $("akgem").disabled = true;
