@@ -831,8 +831,26 @@ $("push").onclick=async()=>{
   try{
     if(!("Notification" in window))throw new Error("Denne enhed understøtter ikke beskeder (iPhone kræver iOS 16.4 eller nyere).");
     s.textContent="Trin 1/4: spørger om tilladelse …";
-    if(await Notification.requestPermission()!=="granted")throw new Error("Du har ikke givet tilladelse til beskeder.");
-    s.textContent="Trin 2/4: starter baggrundstjenesten …";
+        // Tjek om vi allerede har tilladelse, ellers prøv at spørge
+    let tilladelse = Notification.permission;
+    
+    if (tilladelse !== "granted") {
+      // Prøv at spørge brugeren
+      try {
+        tilladelse = await Notification.requestPermission();
+      } catch (e) {
+        // Hvis requestPermission kaster en fejl (kan ske på nogle Android-versioner)
+        tilladelse = Notification.permission;
+      }
+    }
+
+    // Hvis vi stadig ikke har tilladelse, giv en mere præcis fejl
+    if (tilladelse !== "granted") {
+      if (Notification.permission === "denied") {
+        throw new Error("Notifikationer er blokeret i browserens indstillinger for dette websted. Åbn Chrome-indstillinger > Webstedsindstillinger > Notifikationer for at tillade det.");
+      }
+      throw new Error("Du har ikke givet tilladelse til beskeder.");
+    }
     const reg=await t(10000,navigator.serviceWorker.register("firebase-messaging-sw.js").then(()=>navigator.serviceWorker.ready),"Baggrundstjenesten startede ikke. Tjek, at firebase-messaging-sw.js ligger i GitHub-repoet.");
     s.textContent="Trin 3/4: henter besked-nøgle fra Firebase …";
     const token=await t(15000,firebase.messaging().getToken({vapidKey:K.vapidKey,serviceWorkerRegistration:reg}),"Firebase svarede ikke.");
