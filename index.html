@@ -501,6 +501,8 @@ $("annuller").onclick=()=>$("login").close();
 $("lf").onsubmit=async e=>{
   e.preventDefault();$("lfejl").textContent="Logger ind …";
   try{
+    // Sæt persistens til SESSION, så login ryddes når appen lukkes
+    await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
     await auth.signInWithEmailAndPassword($("lemail").value.trim(),$("lkode").value);
     const r=await api({handling:"logind"});
     if(!r.ok){await auth.signOut();$("lfejl").textContent=(r.status===401||r.status===403)?"Denne konto er ikke oprettet som redaktør.":"Serverfejl. Prøv igen.";return}
