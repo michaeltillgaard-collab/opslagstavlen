@@ -109,6 +109,10 @@ dialog{border:0;border-radius:1rem;padding:1.3rem;max-width:26rem;width:92%}dial
 .kort.nod{border-left-color:#b91c1c;background:#fef2f2}
 .ring{display:block;text-align:center;text-decoration:none;background:var(--hav);color:#fff;border-radius:.7rem;padding:.8rem;font-weight:800;margin-top:.6rem;font-size:1.1rem}.ring.nodring{background:#b91c1c}.ring.lys2{background:#fff;color:var(--tekst);border:2px solid #cbd5e1}
 .pager{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin:1.2rem 0}.pager[hidden]{display:none}.pager button{flex:0 0 auto;min-width:7.5rem}.pager span{font-weight:700;text-align:center;flex:1;font-size:.95rem}button:disabled{opacity:.4}
+/* Aktiviteter */
+.akt-dag { background:#fff; border:1px solid #e2e8f0; border-left:6px solid var(--hav); border-radius:.8rem; padding:.8rem 1rem; margin-bottom:.8rem; }
+.akt-dag h3 { margin:0 0 .4rem; font-size:1.1rem; color:var(--hav); }
+.akt-dag p { margin:.2rem 0; white-space:pre-wrap; font-size:.95rem; }  
 .fotos{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:.5rem;margin-top:.8rem}.fotos img{width:100%;height:auto;border-radius:.6rem;cursor:zoom-in;background:#e2e8f0;display:block}
 .prev{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.5rem}.prev div{width:6.5rem}.prev img{width:100%;height:5rem;object-fit:cover;border-radius:.5rem;display:block}.prev button{width:100%;min-height:2rem;font-size:.75rem;background:#fef2f2;color:#b91c1c}
 #foto{max-width:96vw;padding:.6rem}#foto img{max-width:100%;max-height:78vh;display:block;margin:0 auto .6rem}
@@ -147,7 +151,11 @@ footer{text-align:center;font-size:.75rem;color:#64748b;padding:1.5rem 1rem}
  <div>Logget ind som <b id="kemail"></b></div>
  <div class="rk" style="flex-wrap:wrap"><button type="button" class="lys" id="kskift">🔑 Skift adgangskode</button><button type="button" class="lys" id="kadm" hidden>👥 Redaktører og log</button></div>
 </section>
-<nav class="fane" aria-label="Menu"><button id="fOpslag" class="on">📌 Opslag</button><button id="fKontakt">📞 Kontakt</button></nav>
+<nav class="fane" aria-label="Menu">
+  <button id="fOpslag" class="on">📌 Opslag</button>
+  <button id="fAktiviteter">📅 Aktiviteter</button>
+  <button id="fKontakt">📞 Kontakt</button>
+</nav>
 <div id="sideOpslag">
  <div class="bar" id="pushbar">
   <div class="panel" id="iosinfo" hidden>
@@ -209,7 +217,51 @@ footer{text-align:center;font-size:.75rem;color:#64748b;padding:1.5rem 1rem}
 </div>
 
 <div id="sideKontakt" hidden>
- <h2 style="margin:.2rem 0 0">Kontakt og vigtige numre</h2>
+<div id="sideAktiviteter" hidden>
+  <h2 style="margin:.2rem 0 0">Ugentlige aktiviteter</h2>
+  <p class="status" style="margin-bottom:1rem">Oversigten opdateres af redaktørerne, hvis der sker ændringer.</p>
+  
+  <div id="aktListe"></div>
+  
+  <button id="aret" class="lys" style="width:100%;margin-top:1rem" hidden>✏️ Ret aktiviteter</button>
+  
+  <section class="panel" id="aedit" hidden>
+    <h2>Ret aktiviteter</h2>
+    <p style="font-size:.85rem">Skriv én aktivitet pr. linje for hver dag. F.eks. "kl. 10.00: Strik og Stolegymnastik".</p>
+    
+    <label for="a-mandag">Mandag</label>
+    <textarea id="a-mandag" rows="3" placeholder="kl. 10.00: Strik..."></textarea>
+    
+    <label for="a-tirsdag">Tirsdag</label>
+    <textarea id="a-tirsdag" rows="3"></textarea>
+    
+    <label for="a-onsdag">Onsdag</label>
+    <textarea id="a-onsdag" rows="3"></textarea>
+    
+    <label for="a-torsdag">Torsdag</label>
+    <textarea id="a-torsdag" rows="3"></textarea>
+    
+    <label for="a-fredag">Fredag</label>
+    <textarea id="a-fredag" rows="3"></textarea>
+    
+    <label for="a-lordag">Lørdag</label>
+    <textarea id="a-lordag" rows="3"></textarea>
+    
+    <label for="a-soendag">Søndag</label>
+    <textarea id="a-soendag" rows="3"></textarea>
+
+    <label for="a-andet">Andre planlagte aktiviteter (valgfrit)</label>
+    <textarea id="a-andet" rows="3" placeholder="F.eks. Fællesspisning, Udflugter..."></textarea>
+    
+    <p class="fejl" id="afejl2" role="status"></p>
+    
+    <div class="rk">
+      <button type="button" class="lys" id="akannul">Annullér</button>
+      <button type="button" class="rav" id="akgem">Gem</button>
+    </div>
+  </section>
+</div>
+  <h2 style="margin:.2rem 0 0">Kontakt og vigtige numre</h2>
  <div class="kort nod">
   <b>🚨 Nødopkald</b>
   <div>Brand, ulykke eller akut fare for liv.</div>
@@ -744,6 +796,72 @@ function visKontakt(){
   $("kret").hidden=!kode||kred!==null;
   $("kedit").hidden=!kode||kred===null;
 }
+/* Aktiviteter: Hent og vis */
+let aktiviteter = {};
+firebase.firestore().collection("indstillinger").doc("aktiviteter").onSnapshot(d => {
+  aktiviteter = d.exists ? d.data() : {};
+  visAktiviteter();
+});
+function visAktiviteter() {
+  const dage = ["mandag", "tirsdag", "onsdag", "torsdag", "fredag", "lørdag", "søndag"];
+  const navne = ["Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søndag"];
+  
+  const blokke = dage.map((d, i) => {
+    const tekst = aktiviteter[d];
+    if (!tekst) return "";
+    return `<div class="akt-dag"><h3>${navne[i]}</h3><p>${tekst}</p></div>`;
+  }).filter(Boolean); // Fjern tomme dage
+  
+  // Tilføj "Andre aktiviteter" hvis den findes
+  if (aktiviteter.andet) {
+    blokke.push(`<div class="akt-dag" style="border-left-color:var(--rav)"><h3>Andre planlagte aktiviteter</h3><p>${aktiviteter.andet}</p></div>`);
+  }
+
+  if (blokke.length === 0) {
+    $("aktListe").innerHTML = "<p class='tom'>Der er endnu ikke tilføjet aktiviteter.</p>";
+  } else {
+    $("aktListe").innerHTML = blokke.join("");
+  }
+  
+  $("aret").hidden = !kode || !$("aedit").hidden;
+}
+
+$("aret").onclick = () => {
+  ["mandag","tirsdag","onsdag","torsdag","fredag","lørdag","søndag","andet"].forEach(d => {
+    $("a-" + d).value = aktiviteter[d] || "";
+  });
+  $("afejl2").textContent = "";
+  $("aedit").hidden = false;
+  $("aret").hidden = true;
+};
+
+$("akannul").onclick = () => {
+  $("aedit").hidden = true;
+  $("aret").hidden = false;
+};
+
+$("akgem").onclick = async () => {
+  const ny = {};
+  ["mandag","tirsdag","onsdag","torsdag","fredag","lørdag","søndag","andet"].forEach(d => {
+    const v = $("a-" + d).value.trim();
+    if (v) ny[d] = v;
+  });
+  
+  $("akgem").disabled = true;
+  $("afejl2").textContent = "Gemmer …";
+  
+  try {
+    const r = await api({ handling: "aktiviteter", aktiviteter: ny });
+    if (r.status === 401) return udlogget();
+    if (!r.ok) throw 0;
+    $("aedit").hidden = true;
+    $("aret").hidden = false;
+    $("afejl2").textContent = "";
+  } catch (e) {
+    $("afejl2").textContent = "Kunne ikke gemme. Prøv igen.";
+  }
+  $("akgem").disabled = false;
+};
 function kRows(){
   $("krow").replaceChildren(...kred.map((c,n)=>{
     const d=el("div","kort");
