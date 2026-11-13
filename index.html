@@ -812,7 +812,7 @@ function visAktiviteter() {
   }
 }
 $("aret").onclick = () => {
-  const dage = ["mandag","tirsdag","onsdag","torsdag","fredag","lørdag","søndag","andet"];
+  const dage = ["mandag","tirsdag","onsdag","torsdag","fredag","lordag","soendag","andet"];
   dage.forEach(d => {
     const felt = $("a-" + d);
     if (felt) felt.value = aktiviteter[d] || "";
@@ -829,7 +829,7 @@ $("akannul").onclick = () => {
 
 $("akgem").onclick = async () => {
   const ny = {};
-  ["mandag","tirsdag","onsdag","torsdag","fredag","lørdag","søndag","andet"].forEach(d => {
+  ["mandag","tirsdag","onsdag","torsdag","fredag","lordag","soendag","andet"].forEach(d => {
     const felt = $("a-" + d);
     if (felt) {
       const v = felt.value.trim();
