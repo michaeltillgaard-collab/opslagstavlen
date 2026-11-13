@@ -337,7 +337,13 @@ function marker(){
     const k = nok(o);
     if (!(k in markering)) {
       const v = sete[o.id];
-      // Hvis opslaget er ældre end 7 dage og ikke er set før, skal det ikke markeres som nyt
+      
+      // Hvis opslaget er arkiveret, skal det slet ikke markeres som nyt eller rettet
+      if (o.arkiveret) {
+        markering[k] = "";
+        return; // Spring resten af denne opslag over
+      }
+
       const oprettetTid = o.oprettet && o.oprettet.toMillis ? o.oprettet.toMillis() : 0;
       if (v === undefined) {
         markering[k] = (oprettetTid > graense) ? "NYT" : "";
@@ -347,7 +353,10 @@ function marker(){
     }
   });
 
-  const n = opslag.filter(o => markering[nok(o)]).length;
+  // Tæl kun de opslag, der faktisk vises i den aktive liste (dvs. ikke arkiverede)
+  const aktiveOpslag = opslag.filter(o => !o.arkiveret);
+  const n = aktiveOpslag.filter(o => markering[nok(o)]).length;
+  
   $("nye").hidden = !n;
   $("nye").textContent = "🆕 " + n + (n === 1 ? " nyt opslag" : " nye opslag") + " – tryk for at se";
 }
