@@ -549,7 +549,9 @@ function rolle(){
   $("kemail").textContent=bruger?bruger.email:"";
   $("rolle").textContent=kode?"Log ud":"Opret opslag";
   $("rolletekst").innerHTML=kode?"Visning: <b>Redaktør (kan oprette og slette)</b>":"Visning: <b>Beboer (læseadgang)</b>";
-  vis();visKontakt();
+  vis();
+  visKontakt();
+  visAktiviteter();
 }
 const auth=firebase.auth(),SIDEURL=location.href.split("#")[0].split("?")[0];
 function authFejl(x){const c=(x&&x.code)||"";
@@ -810,9 +812,8 @@ function visAktiviteter() {
     const tekst = aktiviteter[d];
     if (!tekst) return "";
     return `<div class="akt-dag"><h3>${navne[i]}</h3><p>${tekst}</p></div>`;
-  }).filter(Boolean); // Fjern tomme dage
+  }).filter(Boolean); 
   
-  // Tilføj "Andre aktiviteter" hvis den findes
   if (aktiviteter.andet) {
     blokke.push(`<div class="akt-dag" style="border-left-color:var(--rav)"><h3>Andre planlagte aktiviteter</h3><p>${aktiviteter.andet}</p></div>`);
   }
@@ -822,6 +823,14 @@ function visAktiviteter() {
   } else {
     $("aktListe").innerHTML = blokke.join("");
   }
+  
+  // NYT: Vis kun "Ret"-knappen, hvis man er redaktør OG ikke er i gang med at redigere
+  if (kode && $("aedit").hidden) {
+    $("aret").hidden = false;
+  } else {
+    $("aret").hidden = true;
+  }
+}
   
   $("aret").hidden = !kode || !$("aedit").hidden;
 }
