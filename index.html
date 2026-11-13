@@ -368,6 +368,7 @@ footer{text-align:center;font-size:.75rem;color:#64748b;padding:1.5rem 1rem}
 <script src="config.js"></script>
 <script>
 const K=window.KONFIG,$=id=>document.getElementById(id);
+  firebase.initializeApp(K.firebase);
 const KAT={vigtigt:"🚨 Vigtigt",arrangement:"🎉 Arrangement",vedligehold:"🛠️ Vedligehold",info:"📢 Information"};
 let opslag=[],filter="alle",kode=false,rolleNavn=null,bruger=null,valgte=[],eksist=[],redigerId=null,kontakter=[],kred=null,sideNr=1, aktiviteter={};
 const PR_SIDE=10;
@@ -1046,7 +1047,7 @@ let ip=null;
 addEventListener("beforeinstallprompt",e=>{e.preventDefault();ip=e;$("inst").hidden=false});
 $("inst").onclick=async()=>{if(ip){ip.prompt();await ip.userChoice;ip=null;$("inst").hidden=true}};
 /* Realtid: lytter på databasen */
-firebase.initializeApp(K.firebase);
+
 firebase.firestore().collection("opslag").orderBy("oprettet","desc").limit(200).onSnapshot(s=>{
   opslag=s.docs.map(d=>({id:d.id,...d.data()}));
     if(foerste&&!baseret){
