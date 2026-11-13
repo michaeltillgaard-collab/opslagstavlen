@@ -722,7 +722,7 @@ $("sletja").onclick = async () => {
     $("sletfejl").textContent = "Opslaget blev ikke slettet. Prøv igen.";
   }
 };
-setTimeout(rolle, 100);
+
 async function flytOpslag(id, retning) {
   try {
     const r = await api({ handling: "flyt", id, retning });
@@ -1066,5 +1066,6 @@ firebase.firestore().collection("opslag").orderBy("oprettet","desc").limit(200).
   vis();
 },()=>{$("opd").innerHTML='<span class="dot off"></span>Ingen forbindelse';
   $("liste").replaceChildren(el("p","tom","Opslagene kunne ikke hentes. Tjek internetforbindelsen."))});
+  setTimeout(rolle, 100);
 }); // <-- Lukker DOMContentLoaded
 </script></body></html>
