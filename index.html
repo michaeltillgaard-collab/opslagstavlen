@@ -812,8 +812,10 @@ function visAktiviteter() {
   }
 }
 $("aret").onclick = () => {
-  ["mandag","tirsdag","onsdag","torsdag","fredag","lørdag","søndag","andet"].forEach(d => {
-    $("a-" + d).value = aktiviteter[d] || "";
+  const dage = ["mandag","tirsdag","onsdag","torsdag","fredag","lørdag","søndag","andet"];
+  dage.forEach(d => {
+    const felt = $("a-" + d);
+    if (felt) felt.value = aktiviteter[d] || "";
   });
   $("afejl2").textContent = "";
   $("aedit").hidden = false;
