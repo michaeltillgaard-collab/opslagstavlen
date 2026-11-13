@@ -475,7 +475,7 @@ function vis(){
     if(mk)m.firstChild.prepend(el("span","nyt"+(mk==="RETTET"?" rettet":""),mk));
     a.append(m,el("h3","",o.titel));
     a.append(el("p","",o.tekst));
-    if(o.arrangement&&o.arrangement.dato)a.append(arrBox(o));
+    if(o.arrangement&&o.arrangement.dato && typeof arrBox === "function")a.append(arrBox(o));
     const bl=(o.billeder||[]).filter(x=>x&&typeof x.url==="string"&&x.url.startsWith("https://firebasestorage.googleapis.com/"));
     if(bl.length){const g=el("div","fotos");bl.forEach(x=>{const i=document.createElement("img");
       i.src=x.url;i.loading="lazy";i.alt="Billede til opslaget: "+(o.titel||"");
@@ -722,7 +722,7 @@ $("sletja").onclick = async () => {
     $("sletfejl").textContent = "Opslaget blev ikke slettet. Prøv igen.";
   }
 };
-rolle();
+setTimeout(rolle, 100);
 async function flytOpslag(id, retning) {
   try {
     const r = await api({ handling: "flyt", id, retning });
