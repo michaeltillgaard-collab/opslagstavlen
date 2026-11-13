@@ -422,27 +422,7 @@ async function api(b){
 function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
 const dato=ts=>ts?ts.toDate().toLocaleDateString("da-DK",{day:"numeric",month:"long",year:"numeric"}):"nu";
 
-/* Realtid: lytter på databasen */
-firebase.initializeApp(K.firebase);
-firebase.firestore().collection("opslag").orderBy("oprettet","desc").limit(200).onSnapshot(s=>{
-  opslag=s.docs.map(d=>({id:d.id,...d.data()}));
-    if(foerste&&!baseret){
-    baseret=true;
-    const nu7 = Date.now();
-    const graense7 = nu7 - 7 * 24 * 60 * 60 * 1000;
-    opslag.forEach(o => {
-      const oprettetTid = o.oprettet && o.oprettet.toMillis ? o.oprettet.toMillis() : 0;
-      // Kun opslag ældre end 7 dage markeres som "set" fra starten
-      if (oprettetTid < graense7) {
-        sete[o.id] = ver(o);
-      }
-    });
-    gemSete();
-  }
-  $("opd").innerHTML='<span class="dot"></span>Live';
-  vis();
-},()=>{$("opd").innerHTML='<span class="dot off"></span>Ingen forbindelse';
-  $("liste").replaceChildren(el("p","tom","Opslagene kunne ikke hentes. Tjek internetforbindelsen."))});
+
 
 function udvalg(){
   const q=$("s").value.toLowerCase();
@@ -1065,5 +1045,26 @@ if(ios&&!iApp){$("push").hidden=true;$("iosinfo").hidden=false}
 let ip=null;
 addEventListener("beforeinstallprompt",e=>{e.preventDefault();ip=e;$("inst").hidden=false});
 $("inst").onclick=async()=>{if(ip){ip.prompt();await ip.userChoice;ip=null;$("inst").hidden=true}};
+/* Realtid: lytter på databasen */
+firebase.initializeApp(K.firebase);
+firebase.firestore().collection("opslag").orderBy("oprettet","desc").limit(200).onSnapshot(s=>{
+  opslag=s.docs.map(d=>({id:d.id,...d.data()}));
+    if(foerste&&!baseret){
+    baseret=true;
+    const nu7 = Date.now();
+    const graense7 = nu7 - 7 * 24 * 60 * 60 * 1000;
+    opslag.forEach(o => {
+      const oprettetTid = o.oprettet && o.oprettet.toMillis ? o.oprettet.toMillis() : 0;
+      // Kun opslag ældre end 7 dage markeres som "set" fra starten
+      if (oprettetTid < graense7) {
+        sete[o.id] = ver(o);
+      }
+    });
+    gemSete();
+  }
+  $("opd").innerHTML='<span class="dot"></span>Live';
+  vis();
+},()=>{$("opd").innerHTML='<span class="dot off"></span>Ingen forbindelse';
+  $("liste").replaceChildren(el("p","tom","Opslagene kunne ikke hentes. Tjek internetforbindelsen."))});
 }); // <-- Lukker DOMContentLoaded
 </script></body></html>
