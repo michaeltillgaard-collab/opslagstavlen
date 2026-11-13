@@ -215,8 +215,6 @@ footer{text-align:center;font-size:.75rem;color:#64748b;padding:1.5rem 1rem}
  <button type="button" id="pf">← Forrige</button><span id="pt"></span><button type="button" id="pn">Næste →</button>
 </nav>
 </div>
-
-<div id="sideKontakt" hidden>
 <div id="sideAktiviteter" hidden>
   <h2 style="margin:.2rem 0 0">Ugentlige aktiviteter</h2>
   <p class="status" style="margin-bottom:1rem">Oversigten opdateres af redaktørerne, hvis der sker ændringer.</p>
@@ -261,6 +259,7 @@ footer{text-align:center;font-size:.75rem;color:#64748b;padding:1.5rem 1rem}
     </div>
   </section>
 </div>
+<div id="sideKontakt" hidden>
   <h2 style="margin:.2rem 0 0">Kontakt og vigtige numre</h2>
  <div class="kort nod">
   <b>🚨 Nødopkald</b>
@@ -831,10 +830,6 @@ function visAktiviteter() {
     $("aret").hidden = true;
   }
 }
-  
-  $("aret").hidden = !kode || !$("aedit").hidden;
-}
-
 $("aret").onclick = () => {
   ["mandag","tirsdag","onsdag","torsdag","fredag","lørdag","søndag","andet"].forEach(d => {
     $("a-" + d).value = aktiviteter[d] || "";
