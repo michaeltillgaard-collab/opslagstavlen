@@ -175,6 +175,7 @@ footer{text-align:center;font-size:.75rem;color:#64748b;padding:1.5rem 1rem}
    <label for="ad">Dato</label><input type="date" id="ad">
    <label for="at">Tidspunkt (valgfrit)</label><input type="time" id="at">
    <label for="as">Sted (valgfrit)</label><input type="text" id="as" maxlength="100" placeholder="fx Fælleshuset">
+   <button type="button" id="rydDato" class="lys" style="width:100%;margin-top:.6rem;font-size:.85rem;min-height:2.4rem">🗑️ Ryd dato og tid</button>
   </div>
   <label for="a">Afsender</label><input type="text" id="a" maxlength="60">
   <label for="b">Besked</label><textarea id="b" rows="5" maxlength="3000"></textarea>
@@ -739,6 +740,13 @@ function prev(){
 }
 function visD(){$("dbox").hidden=!$("harD").checked}
 $("harD").onchange=visD;
+$("rydDato").onclick = () => {
+$("harD").checked = false;
+$("ad").value = "";
+$("at").value = "";
+$("as").value = "";
+visD();
+};
 const idag=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 function arrBox(o){
   const r=o.arrangement,d=new Date(r.dato+"T12:00:00");
