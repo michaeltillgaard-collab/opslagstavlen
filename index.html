@@ -498,7 +498,7 @@ function vis(){
       r.innerHTML = "<span>✏️</span>Ret<br>opslag";
       const b=el("button","fare");
       b.innerHTML = "<span>🗑</span>Slet<br>opslag";
-      r.onclick=()=>{ if(typeof startRet === "function") startRet(o); };
+      r.onclick=()=>{ if(typeof window.startRet === "function") window.startRet(o); };
       b.onclick=()=>slet(o.id);
       d.append(r,b);
       
@@ -956,7 +956,7 @@ function arrBox(o){
   }
   return b;
 }
-  function startRet(o){
+  window.startRet = function(o){
   redigerId=o.id;eksist=(o.billeder||[]).filter(x=>x&&x.sti&&x.url);valgte=[];
   $("t").value=o.titel||"";$("b").value=o.tekst||"";$("a").value=o.afsender||"";$("k").value=o.kategori||"info";
   $("f").checked=!!o.fastgjort;
