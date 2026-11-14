@@ -498,7 +498,7 @@ function vis(){
       r.innerHTML = "<span>✏️</span>Ret<br>opslag";
       const b=el("button","fare");
       b.innerHTML = "<span>🗑</span>Slet<br>opslag";
-      r.onclick=()=>startRet(o);
+      r.onclick=()=>{ if(typeof startRet === "function") startRet(o); };
       b.onclick=()=>slet(o.id);
       d.append(r,b);
       
