@@ -956,6 +956,16 @@ function arrBox(o){
   }
   return b;
 }
+  function startRet(o){
+  redigerId=o.id;eksist=(o.billeder||[]).filter(x=>x&&x.sti&&x.url);valgte=[];
+  $("t").value=o.titel||"";$("b").value=o.tekst||"";$("a").value=o.afsender||"";$("k").value=o.kategori||"info";
+  $("f").checked=!!o.fastgjort;
+  $("ark").checked=!!o.arkiveret; // <-- NYT
+  $("p").checked=false;
+  const ar=o.arrangement;$("harD").checked=!!ar;$("ad").value=ar?ar.dato:"";$("at").value=ar&&ar.tid?ar.tid:"";$("as").value=ar&&ar.sted?ar.sted:"";visD();
+  $("ah").textContent="Ret opslag";$("udgiv").textContent="Gem ændringer";$("annuller2").hidden=false;
+  $("afejl").textContent="";prev();$("admin").scrollIntoView({behavior:"smooth"});
+}
 function ics(o){
   const r=o.arrangement,e=x=>String(x||"").replace(/\\/g,"\\\\").replace(/[;,]/g,"\\$&").replace(/\r?\n/g,"\\n"),
     p2=n=>String(n).padStart(2,"0"),ymd=x=>x.getFullYear()+p2(x.getMonth()+1)+p2(x.getDate()),
@@ -972,16 +982,7 @@ function ics(o){
   a.href=URL.createObjectURL(new Blob([l.join("\r\n")],{type:"text/calendar;charset=utf-8"}));
   a.download="arrangement.ics";document.body.append(a);a.click();a.remove();
   setTimeout(()=>URL.revokeObjectURL(a.href),4000)}
-function startRet(o){
-  redigerId=o.id;eksist=(o.billeder||[]).filter(x=>x&&x.sti&&x.url);valgte=[];
-  $("t").value=o.titel||"";$("b").value=o.tekst||"";$("a").value=o.afsender||"";$("k").value=o.kategori||"info";
-  $("f").checked=!!o.fastgjort;
-  $("ark").checked=!!o.arkiveret; // <-- NYT
-  $("p").checked=false;
-  const ar=o.arrangement;$("harD").checked=!!ar;$("ad").value=ar?ar.dato:"";$("at").value=ar&&ar.tid?ar.tid:"";$("as").value=ar&&ar.sted?ar.sted:"";visD();
-  $("ah").textContent="Ret opslag";$("udgiv").textContent="Gem ændringer";$("annuller2").hidden=false;
-  $("afejl").textContent="";prev();$("admin").scrollIntoView({behavior:"smooth"});
-}
+
 function stopRet(){
   redigerId=null;eksist=[];valgte=[];
   $("t").value="";
