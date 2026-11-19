@@ -288,7 +288,7 @@ footer{text-align:center;font-size:.75rem;color:#64748b;padding:1.5rem 1rem}
 </div>
 </main>
   <div style="text-align: center; margin: 1.5rem 1rem 0;">
-  <button class="rav" id="rolle" style="width: 100%; max-width: 30rem;">🔐 Log ind som redaktør</button>
+  <button class="rav" id="rolle-bund" style="width: 100%; max-width: 30rem;">🔐 Log ind som redaktør</button>
 </div>
 <footer>© 2026 Strandhusene - Afdeling 55 – seniorbofællesskab<br><button type="button" class="lnk" id="omdata">Om appen og dine data</button></footer>
 
@@ -539,7 +539,12 @@ try{fs(localStorage.getItem("fs")||"")}catch(e){}
 function rolle(){
   $("admin").hidden=!kode;$("konto").hidden=!kode;$("kadm").hidden=rolleNavn!=="admin";
   $("kemail").textContent=bruger?bruger.email:"";
-  $("rolle").textContent=kode?"Log ud":"Log ind som redaktør";
+  
+  // Top-knappen: Vises kun, når man er logget ind
+  $("rolle-top").hidden = !kode;
+  
+  // Bund-knappen: Skifter tekst afhængigt af login-status
+  $("rolle-bund").textContent = kode ? "Log ud" : "🔐 Log ind som redaktør";
   
   // Den mørkeblå linje vises kun for redaktører
   if (kode) {
@@ -573,7 +578,15 @@ auth.onAuthStateChanged(async u=>{
   }catch(x){}
   bruger=null;kode=false;rolleNavn=null;rolle();
 });
-$("rolle").onclick=()=>{if(kode){auth.signOut()}else{$("lfejl").textContent="";$("login").showModal()}};
+$("rolle-top").onclick = () => { if (kode) auth.signOut(); };
+$("rolle-bund").onclick = () => {
+  if (kode) {
+    auth.signOut();
+  } else {
+    $("lfejl").textContent = "";
+    $("login").showModal();
+  }
+};
 $("annuller").onclick=()=>$("login").close();
 $("lf").onsubmit=async e=>{
   e.preventDefault();$("lfejl").textContent="Logger ind …";
