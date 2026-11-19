@@ -539,7 +539,7 @@ try{fs(localStorage.getItem("fs")||"")}catch(e){}
 function rolle(){
   $("admin").hidden=!kode;$("konto").hidden=!kode;$("kadm").hidden=rolleNavn!=="admin";
   $("kemail").textContent=bruger?bruger.email:"";
-  $("rolle").textContent=kode?"Log ud":"Opret opslag";
+  $("rolle").textContent=kode?"Log ud":"Log ind som redaktør";
   
   // Den mørkeblå linje vises kun for redaktører
   if (kode) {
