@@ -607,7 +607,11 @@ $("glemt").onclick=async()=>{
     $("lfejl").textContent="Hvis adressen er oprettet som redaktør, er der sendt en mail med et link til at vælge en ny adgangskode. Kig også i uønsket post."}
   catch(x){$("lfejl").textContent=authFejl(x)}
 };
-async function udlogget(){await auth.signOut();alert("Din adgang er udløbet eller fjernet. Log ind igen.")}
+async function udlogget(){
+  await auth.signOut();
+  scrollTo({top: 0, behavior: "smooth"});
+  alert("Din adgang er udløbet eller fjernet. Log ind igen.");
+}
 $("kskift").onclick=()=>{["sn0","sn1","sn2"].forEach(i=>$(i).value="");$("sfejl").textContent="";$("skift").showModal()};
 $("sannul").onclick=()=>$("skift").close();
 $("skf").onsubmit=async e=>{
