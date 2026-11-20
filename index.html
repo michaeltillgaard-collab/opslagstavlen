@@ -578,10 +578,16 @@ auth.onAuthStateChanged(async u=>{
   }catch(x){}
   bruger=null;kode=false;rolleNavn=null;rolle();
 });
-$("rolle-top").onclick = () => { if (kode) auth.signOut(); };
+$("rolle-top").onclick = () => { 
+  if (kode) {
+    auth.signOut();
+    scrollTo({top: 0, behavior: "smooth"});
+  }
+};
 $("rolle-bund").onclick = () => {
   if (kode) {
     auth.signOut();
+    scrollTo({top: 0, behavior: "smooth"});
   } else {
     $("lfejl").textContent = "";
     $("login").showModal();
