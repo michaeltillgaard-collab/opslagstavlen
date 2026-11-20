@@ -597,6 +597,7 @@ $("lf").onsubmit=async e=>{
     const r=await api({handling:"logind"});
     if(!r.ok){await auth.signOut();$("lfejl").textContent=(r.status===401||r.status===403)?"Denne konto er ikke oprettet som redaktør.":"Serverfejl. Prøv igen.";return}
     $("lkode").value="";$("login").close();
+    scrollTo({top: 0, behavior: "smooth"}); // <-- NYT: Rul til toppen efter login
   }catch(x){$("lfejl").textContent=authFejl(x)}
 };
 $("glemt").onclick=async()=>{
