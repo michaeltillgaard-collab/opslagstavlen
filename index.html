@@ -775,8 +775,7 @@ $("udgiv").onclick = async () => {
     const ret = !!redigerId;
     stopRet();
     $("afejl").textContent = ret ? "Ændringerne er gemt." : "Opslaget er udgivet.";
-    console.log("Opslag gemt! Status:", r.status, "Ret?", ret);
-    stopRet();
+
   } catch (x) {
     $("afejl").textContent = "Opslaget blev ikke udgivet. Prøv igen.";
   }
