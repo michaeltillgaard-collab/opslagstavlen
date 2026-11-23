@@ -1025,7 +1025,7 @@ function visFotos() {
   $("fAdmin").hidden = !kode || fRedigerId !== null;
 }
 
-function startFRed(a) {
+window.startFRed = function(a) {
   fRedigerId = a.id;
   fEksist = (a.billeder||[]).filter(x => x && x.sti && x.url);
   fValgte = [];
@@ -1037,12 +1037,11 @@ function startFRed(a) {
   $("fudgiv").textContent = "Gem ændringer";
   $("fannuller").hidden = false;
   
-  // Sikr os, at formularen er synlig, uanset hvad visFotos() måtte have gjort
   $("fAdmin").hidden = false; 
   
   fPrev();
   $("fAdmin").scrollIntoView({behavior:"smooth"});
-}
+};
 
 function stopFRed() {
   fRedigerId = null;
