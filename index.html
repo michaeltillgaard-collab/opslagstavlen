@@ -777,6 +777,7 @@ $("udgiv").onclick = async () => {
     $("afejl").textContent = ret ? "Ændringerne er gemt." : "Opslaget er udgivet.";
 
   } catch (x) {
+    console.error("FANGET FEJL I UDGIV:", x);
     $("afejl").textContent = "Opslaget blev ikke udgivet. Prøv igen.";
   }
   
