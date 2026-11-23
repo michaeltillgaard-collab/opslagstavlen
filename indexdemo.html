@@ -106,21 +106,14 @@ dialog{border:0;border-radius:1rem;padding:1.3rem;max-width:26rem;width:92%}dial
 .rk{display:flex;gap:.6rem;margin-top:1rem}.rk button{flex:1}
 .fejl{color:#b91c1c;font-size:.85rem;min-height:1.2rem}
 .status:empty{display:none}
-#pushbar:not(:has(button:not([hidden]),.panel:not([hidden]),.status:not(:empty))){display:none}
+#pushbar:not(:has(button:not([hidden]),.panel:not([hidden]),.status:not(:empty))){display:none !important}
 .arr{background:#eff6ff;border:2px solid #93c5fd;border-radius:.8rem;padding:.7rem .9rem;margin:.7rem 0;display:flex;flex-direction:column}
 .arr.forbi{background:#f1f5f9;border-color:#cbd5e1;color:#475569}.arr .sted{font-weight:400;font-size:.9rem;margin-top:.2rem}.arr .dato{font-weight:600;font-size:.95rem}.arr .kal{margin-top:.6rem;width:auto;align-self:flex-start;font-size:.95rem;min-height:2.6rem;padding:.3rem 1rem;background:#fff;color:var(--hav);border:2px solid #93c5fd}
 .arr .kal:hover{background:#eff6ff}
 #dbox{background:#fff;border:1px solid #fcd34d;border-radius:.6rem;padding:.2rem .8rem .8rem;margin-top:.4rem}
 .nyt{display:inline-block;background:#fef2f2;color:#b91c1c;font-size:.75rem;font-weight:700;padding:.1rem .6rem;border-radius:.4rem;margin-right:.5rem;letter-spacing:.02em;border:1px solid #fecaca}
 .nyt.rettet{background:#fffbeb;color:#b45309;border-color:#fde68a}article.ny{box-shadow:0 0 0 3px #fecaca}article{scroll-margin-top:8rem}#nye{width:100%}
-.fane {
-  display: flex;
-  gap: .4rem;
-  margin-bottom: 1rem;
-  background: #e2e8f0; /* En let grå baggrund, der samler menuen */
-  padding: .3rem;
-  border-radius: .8rem;
-}
+.fane{display:flex;gap:.4rem;margin-bottom:.5rem;background:#e2e8f0;#pushbar:not(:has(button:not([hidden
 .fane button {
   flex: 1;
   background: transparent;
