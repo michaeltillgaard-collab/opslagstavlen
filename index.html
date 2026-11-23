@@ -1178,7 +1178,36 @@ $("fKontakt").onclick = () => { location.hash = "kontakt"; };
 addEventListener("hashchange", side);
 side();
 
+  /* Swipe navigation */
+  let touchstartX = 0;
+  let touchendX = 0;
+  const sw = 75; // Minimum antal pixels fingeren skal flyttes (for at undgå at trigger ved et let tryk)
 
+  function checkSwipe() {
+    if (touchendX < touchstartX - sw) {
+      // Swipede mod venstre (fingeren gik mod højre) -> Gå til næste
+      if (location.hash === "" || location.hash === "#opslag") location.hash = "aktiviteter";
+      else if (location.hash === "#aktiviteter") location.hash = "fotos";
+      else if (location.hash === "#fotos") location.hash = "kontakt";
+    }
+    
+    if (touchendX > touchstartX + sw) {
+      // Swipede mod højre (fingeren gik mod venstre) -> Gå til forrige
+      if (location.hash === "#kontakt") location.hash = "fotos";
+      else if (location.hash === "#fotos") location.hash = "aktiviteter";
+      else if (location.hash === "#aktiviteter") location.hash = "opslag";
+    }
+  }
+
+  document.addEventListener("touchstart", e => {
+    touchstartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  document.addEventListener("touchend", e => {
+    touchendX = e.changedTouches[0].screenX;
+    checkSwipe();
+  }, { passive: true });
+    
 function visD(){$("dbox").hidden=!$("harD").checked}
 $("harD").onchange=visD;
 $("rydDato").onclick = () => {
