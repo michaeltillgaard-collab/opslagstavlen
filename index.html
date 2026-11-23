@@ -1128,16 +1128,17 @@ addEventListener("hashchange", side);
 side();
 
 /* Billeder: forkleinelse i browseren, så de er hurtige at sende og hente */
-function komprimer(fil){return new Promise((ok,fejl)=>{
-  const u=URL.createObjectURL(fil),i=new Image();
-  i.onload=()=>{URL.revokeObjectURL(u);
-    const sk=Math.min(1,1600/Math.max(i.width,i.height)),c=document.createElement("canvas");
-    c.width=Math.round(i.width*sk);c.height=Math.round(i.height*sk);
-    c.getContext("2d").drawImage(i,0,0,c.width,c.height);
-    let d;for(const q of [.8,.6,.45]){d=c.toDataURL("image/jpeg",q);if(d.length<1.8e6)break}
-    d.length<1.9e6?ok(d):fejl(new Error("Billedet er for stort."))};
-  i.onerror=()=>{URL.revokeObjectURL(u);fejl(new Error("Billedet kunne ikke læses."))};
-  i.src=u})}
+function komprimer(fil){
+  return new Promise((ok,fejl)=>{
+    const u=URL.createObjectURL(fil),i=new Image();
+    i.onload=()=>{URL.revokeObjectURL(u);
+      const sk=Math.min(1,1600/Math.max(i.width,i.height)),c=document.createElement("canvas");
+      c.width=Math.round(i.width*sk);c.height=Math.round(i.height*sk);
+      c.getContext("2d").drawImage(i,0,0,c.width,c.height);
+      let d;for(const q of [.8,.6,.45]){d=c.toDataURL("image/jpeg",q);if(d.length<1.8e6)break}
+      d.length<1.9e6?ok(d):fejl(new Error("Billedet er for stort."))};
+    i.onerror=()=>{URL.revokeObjectURL(u);fejl(new Error("Billedet kunne ikke læses."))};
+    i.src=u})}
 function prev(){
   const mk=(src,alt,fjern)=>{const w=el("div"),i=document.createElement("img"),b=el("button","","Fjern");
     i.src=src;i.alt=alt;b.type="button";b.onclick=fjern;w.append(i,b);return w};
