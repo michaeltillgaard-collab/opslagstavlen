@@ -585,6 +585,7 @@ function rolle(){
   vis();
   visKontakt();
   visAktiviteter();
+  visFotos();
 }
 const auth=firebase.auth(),SIDEURL=location.href.split("#")[0].split("?")[0];
 function authFejl(x){const c=(x&&x.code)||"";
@@ -907,6 +908,9 @@ $("akgem").onclick = async () => {
       if (v) ny[d] = v;
     }
   });
+
+
+
   
   $("akgem").disabled = true;
   $("afejl2").textContent = "Gemmer …";
@@ -947,25 +951,177 @@ $("kgem").onclick=async()=>{
   }catch(x){$("kfejl").textContent="Kunne ikke gemmes. Prøv igen."}
   $("kgem").disabled=false;
 };
-document.addEventListener("DOMContentLoaded", () => {
+
+  /* ===== FOTOS ===== */
+let albums = [], fRedigerId = null, fValgte = [], fEksist = [];
+
+firebase.firestore().collection("albums").orderBy("oprettet", "desc").limit(100).onSnapshot(
+  s => {
+    albums = s.docs.map(d => ({ id: d.id, ...d.data() }));
+    visFotos();
+  },
+  () => {
+    $("fliste").replaceChildren(el("p","tom","Albums kunne ikke hentes."));
+  }
+);
+
+function visFotos() {
+  const l = $("fliste");
+  if (!albums.length) {
+    l.replaceChildren(el("p","tom","Der er endnu ikke oprettet fotoalbums."));
+  } else {
+    l.replaceChildren(...albums.map(a => {
+      const k = el("div","kort");
+      k.append(el("b","", a.titel || "(uden titel)"));
+      if (a.dato) k.append(el("div","", "📅 " + new Date(a.dato+"T12:00:00").toLocaleDateString("da-DK",{day:"numeric",month:"long",year:"numeric"})));
+      if (a.tekst) k.append(el("p","", a.tekst));
+      const bl = (a.billeder||[]).filter(x => x && x.url);
+      if (bl.length) {
+        const g = el("div","fotos");
+        bl.forEach(x => {
+          const i = document.createElement("img");
+          i.src = x.url; i.loading = "lazy"; i.alt = "Foto fra " + (a.titel||"album");
+          i.onclick = () => { $("stor").src = x.url; $("stor").alt = i.alt; $("foto").showModal(); };
+          g.append(i);
+        });
+        k.append(g);
+      }
+      if (kode) {
+        const d = el("div","slet");
+        const r = el("button","ret");
+        r.innerHTML = "<span>✏️</span>Ret<br>album";
+        r.onclick = () => startFRed(a);
+        const b = el("button","fare");
+        b.innerHTML = "<span>🗑</span>Slet<br>album";
+        b.onclick = () => sletAlbum(a.id);
+        d.append(r, b);
+        k.append(d);
+      }
+      return k;
+    }));
+  }
+  $("fAdmin").hidden = !kode || fRedigerId !== null;
+}
+
+function startFRed(a) {
+  fRedigerId = a.id;
+  fEksist = (a.billeder||[]).filter(x => x && x.sti && x.url);
+  fValgte = [];
+  $("ft").value = a.titel || "";
+  $("fb").value = a.tekst || "";
+  $("fd").value = a.dato || "";
+  $("ffejl").textContent = "";
+  $("fh").textContent = "Ret fotoalbum";
+  $("fudgiv").textContent = "Gem ændringer";
+  $("fannuller").hidden = false;
+  fPrev();
+  visFotos();
+  $("fAdmin").scrollIntoView({behavior:"smooth"});
+}
+
+function stopFRed() {
+  fRedigerId = null;
+  fEksist = [];
+  fValgte = [];
+  $("ft").value = "";
+  $("fb").value = "";
+  $("fd").value = "";
+  $("ffejl").textContent = "";
+  $("fh").textContent = "Opret nyt fotoalbum";
+  $("fudgiv").textContent = "Gem album";
+  $("fannuller").hidden = true;
+  fPrev();
+  visFotos();
+}
+
+function fPrev() {
+  const mk = (src, alt, fjern) => {
+    const w = el("div"), i = document.createElement("img"), b = el("button","","Fjern");
+    i.src = src; i.alt = alt; b.type = "button"; b.onclick = fjern;
+    w.append(i, b); return w;
+  };
+  $("fprev").replaceChildren(
+    ...fEksist.map((x,n) => mk(x.url, "Eksisterende billede "+(n+1), () => { fEksist.splice(n,1); fPrev(); })),
+    ...fValgte.map((d,n) => mk(d, "Valgt billede "+(n+1), () => { fValgte.splice(n,1); fPrev(); }))
+  );
+}
+
+$("fannuller").onclick = stopFRed;
+
+$("ffil").onchange = async e => {
+  const fl = [...e.target.files].slice(0, 12 - fValgte.length - fEksist.length);
+  e.target.value = "";
+  if (!fl.length) { $("ffejl").textContent = "Der kan højst vælges 12 billeder i alt."; return; }
+  $("ffejl").textContent = "Forbereder billeder …";
+  try {
+    for (const f of fl) fValgte.push(await komprimer(f));
+    $("ffejl").textContent = "";
+  } catch (x) { $("ffejl").textContent = x.message; }
+  fPrev();
+};
+
+$("fudgiv").onclick = async () => {
+  const b = {
+    handling: fRedigerId ? "retAlbum" : "opretAlbum",
+    titel: $("ft").value.trim(),
+    tekst: $("fb").value.trim(),
+    dato: $("fd").value,
+    billeder: fValgte
+  };
+  if (fRedigerId) {
+    b.id = fRedigerId;
+    b.behold = fEksist.map(x => x.sti);
+  }
+  if (!b.titel) { $("ffejl").textContent = "Skriv en titel på albummet."; return; }
+  if (!b.billeder.length && !b.behold?.length) { $("ffejl").textContent = "Vælg mindst ét billede."; return; }
+
+  $("fudgiv").disabled = true;
+  $("ffejl").textContent = "Gemmer …";
+  try {
+    const r = await api(b);
+    if (r.status === 401) return udlogget();
+    if (!r.ok) throw 0;
+    stopFRed();
+  } catch (x) {
+    $("ffejl").textContent = "Albummet blev ikke gemt. Prøv igen.";
+  }
+  $("fudgiv").disabled = false;
+};
+
+async function sletAlbum(id) {
+  if (!confirm("Er du sikker på, at du vil slette dette fotoalbum? Det kan ikke fortrydes.")) return;
+  try {
+    const r = await api({ handling: "sletAlbum", id });
+    if (r.status === 401) return udlogget();
+    if (!r.ok) throw 0;
+  } catch (x) {
+    alert("Albummet blev ikke slettet. Prøv igen.");
+  }
+}
+  
+  document.addEventListener("DOMContentLoaded", () => {
 function side(){
   const h = location.hash;
   const k = h === "#kontakt";
   const a = h === "#aktiviteter";
+  const f = h === "#fotos";
   
-  $("sideOpslag").hidden = k || a;
+  $("sideOpslag").hidden = k || a || f;
   $("sideKontakt").hidden = !k;
   $("sideAktiviteter").hidden = !a;
+  $("sideFotos").hidden = !f;
   
-  $("fOpslag").classList.toggle("on", !k && !a);
+  $("fOpslag").classList.toggle("on", !k && !a && !f);
   $("fKontakt").classList.toggle("on", k);
   $("fAktiviteter").classList.toggle("on", a);
+  $("fFotos").classList.toggle("on", f);
   
   scrollTo(0,0);
 }
 
 $("fOpslag").onclick = () => { location.hash = "opslag"; };
 $("fAktiviteter").onclick = () => { location.hash = "aktiviteter"; };
+$("fFotos").onclick = () => { location.hash = "fotos"; };
 $("fKontakt").onclick = () => { location.hash = "kontakt"; };
 
 addEventListener("hashchange", side);
