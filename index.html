@@ -1036,8 +1036,11 @@ function startFRed(a) {
   $("fh").textContent = "Ret fotoalbum";
   $("fudgiv").textContent = "Gem ændringer";
   $("fannuller").hidden = false;
+  
+  // Sikr os, at formularen er synlig, uanset hvad visFotos() måtte have gjort
+  $("fAdmin").hidden = false; 
+  
   fPrev();
-  visFotos();
   $("fAdmin").scrollIntoView({behavior:"smooth"});
 }
 
