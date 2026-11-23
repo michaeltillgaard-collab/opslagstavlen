@@ -162,6 +162,7 @@ footer{text-align:center;font-size:.75rem;color:#64748b;padding:1.5rem 1rem}
 <nav class="fane" aria-label="Menu">
   <button id="fOpslag" class="on">📌 Opslag</button>
   <button id="fAktiviteter">📅 Aktiviteter</button>
+  <button id="fFotos">📷 Fotos</button>
   <button id="fKontakt">📞 Kontakt</button>
 </nav>
 <div id="sideOpslag">
@@ -268,7 +269,34 @@ footer{text-align:center;font-size:.75rem;color:#64748b;padding:1.5rem 1rem}
     </div>
   </section>
 </div>
-<div id="sideKontakt" hidden>
+<div id="sideFotos" hidden>
+  <h2 style="margin:.2rem 0 0">Fotos fra fællesskabet</h2>
+  <p class="status" style="margin-bottom:1rem">Billeder indsendes af redaktørerne.</p>
+
+  <!-- Formular til oprettelse/redigering - kun for redaktører -->
+  <section class="panel" id="fAdmin" hidden>
+    <h2 id="fh">Opret nyt fotoalbum</h2>
+    <label for="ft">Titel på album</label>
+    <input type="text" id="ft" maxlength="120" placeholder="fx Sommerfest 2026">
+
+    <label for="fb">Beskrivelse (valgfrit)</label>
+    <textarea id="fb" rows="3" maxlength="1000"></textarea>
+
+    <label for="fd">Dato (valgfrit)</label>
+    <input type="date" id="fd">
+
+    <label for="ffil">Billeder (max 12)</label>
+    <input type="file" id="ffil" accept="image/*" multiple>
+    <div class="prev" id="fprev"></div>
+
+    <p class="fejl" id="ffejl" role="status"></p>
+    <button id="fudgiv" class="rav" style="width:100%">Gem album</button>
+    <button id="fannuller" type="button" class="lys" style="width:100%;margin-top:.6rem" hidden>Annullér redigering</button>
+  </section>
+
+  <div id="fliste"><p class="status">Henter albums …</p></div>
+</div>
+  <div id="sideKontakt" hidden>
   <h2 style="margin:.2rem 0 0">Kontakt og vigtige numre</h2>
  <div class="kort nod">
   <b>🚨 Nødopkald</b>
