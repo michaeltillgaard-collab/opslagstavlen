@@ -236,11 +236,18 @@ footer{text-align:center;font-size:.75rem;color:#64748b;padding:1.5rem 1rem}
 }
 
 .bundmenu button.on {
-  color: #1e3a8a !important;
-  background-color: #ffffff !important; /* Hvid baggrund bag ikonet */
+  background-color: #1e3a8a !important; /* Den blå baggrund */
+  color: #ffffff !important;            /* Hvid tekst */
+  border-radius: 0.6rem !important;     /* Runde hjørner som på dit billede */
+  margin: 0.4rem 0.2rem !important;     /* Lidt luft omkring den, så den ikke rører kanten */
+  -webkit-text-fill-color: #ffffff !important;
 }
-.bundmenu button.on span {
-  color: #1e3a8a !important;
+
+.bundmenu button.on span, 
+.bundmenu button.on .ikon {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  transform: scale(1.1); /* Ikonet bliver en smule større */
 }
 </style>
 </head>
