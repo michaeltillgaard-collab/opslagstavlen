@@ -182,8 +182,13 @@ dialog{border:0;border-radius:1rem;padding:1.3rem;max-width:26rem;width:92%}dial
 
 /* Den aktive knap bliver blå */
 .bundmenu button.on {
-  color: #1e3a8a !important; /* Den præcise blå farve i stedet for var(--hav) */
+  color: #1e3a8a !important;
   background: transparent !important;
+}
+
+/* NYT: Tvinger den blå farve på selve teksten og ikonet, uanset hvad andre regler siger */
+.bundmenu button.on span {
+  color: #1e3a8a !important;
 }
 
 .bundmenu button.on .ikon {
