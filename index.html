@@ -234,27 +234,17 @@ footer{text-align:center;font-size:.75rem;color:#64748b;padding:1.5rem 1rem}
   article h3 { font-size: 1.2rem; }
 }
 
-/* Tvinger bundmenuen til at være blå */
-.bundmenu button.on,
-.bundmenu button.on .ikon,
-.bundmenu button.on span {
-  color: var(--hav) !important;
-  -webkit-text-fill-color: var(--hav) !important;
-  background: transparent !important;
-}
-
-.bundmenu button.on .ikon {
-  transform: scale(1.1);
-}
-#bOpslag.on, #bAktiviteter.on, #bFotos.on, #bKontakt.on {
+/* Den endelige regel for den aktive bundmenu */
+nav.bundmenu button.on,
+nav.bundmenu button.on span,
+nav.bundmenu button.on .ikon {
   color: #1e3a8a !important;
-  -webkit-text-fill-color: #1e3a8a !important; /* Tvinger farven på mobil */
   background: transparent !important;
-}
-
-#bOpslag.on *, #bAktiviteter.on *, #bFotos.on *, #bKontakt.on * {
-  color: #1e3a8a !important;
   -webkit-text-fill-color: #1e3a8a !important;
+}
+
+nav.bundmenu button.on .ikon {
+  transform: scale(1.1);
 }
 </style>
 </head>
