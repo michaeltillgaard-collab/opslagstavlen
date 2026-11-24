@@ -136,6 +136,61 @@ dialog{border:0;border-radius:1rem;padding:1.3rem;max-width:26rem;width:92%}dial
   color: #fff;
   border-color: var(--hav);
 }
+
+/* Skjul den gamle menu i toppen */
+.fane {
+  display: none !important; 
+}
+
+/* Den nye faste bundmenu */
+.bundmenu {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  display: flex;
+  justify-content: space-around; /* Fordeler knapperne jævnt */
+  align-items: center;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+  z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom); /* Tager højde for iPhone's bundlinje */
+}
+
+.bundmenu button {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: #64748b; /* Grå tekst/ikoner når de ikke er aktive */
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.6rem 0.2rem;
+  min-height: 4rem;
+  border-radius: 0; /* Fjerne de runde knap-hjørner */
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.bundmenu button .ikon {
+  font-size: 1.4rem;
+  margin-bottom: 0.2rem;
+}
+
+/* Den aktive knap bliver blå */
+.bundmenu button.on {
+  color: var(--hav); /* Bruger din eksisterende blå farve */
+  background: transparent;
+}
+
+/* Sørg for at indholdet i main ikke gemmer sig bag bundmenuen */
+main {
+  padding-bottom: 6rem !important; 
+}
+  
 .kort{background:#fff;border:1px solid #e2e8f0;border-left:8px solid var(--hav);border-radius:1rem;padding:1rem 1.1rem;margin:.9rem 0}.kort b{font-size:1.15rem}
 .kort.nod{border-left-color:#b91c1c;background:#fef2f2}
 .ring{display:block;text-align:center;text-decoration:none;background:var(--hav);color:#fff;border-radius:.7rem;padding:.8rem;font-weight:800;margin-top:.6rem;font-size:1.1rem}.ring.nodring{background:#b91c1c}.ring.lys2{background:#fff;color:var(--tekst);border:2px solid #cbd5e1}
@@ -348,6 +403,25 @@ footer{text-align:center;font-size:.75rem;color:#64748b;padding:1.5rem 1rem}
 </div>
 <footer>© 2026 Strandhusene - Afdeling 55 – seniorbofællesskab<br><button type="button" class="lnk" id="omdata">Om appen og dine data</button></footer>
 
+<nav class="bundmenu" aria-label="Bundmenu">
+  <button id="bOpslag" class="on">
+    <span class="ikon">📌</span>
+    <span>Opslag</span>
+  </button>
+  <button id="bAktiviteter">
+    <span class="ikon">📅</span>
+    <span>Aktiviteter</span>
+  </button>
+  <button id="bFotos">
+    <span class="ikon">📷</span>
+    <span>Fotos</span>
+  </button>
+  <button id="bKontakt">
+    <span class="ikon">📞</span>
+    <span>Kontakt</span>
+  </button>
+</nav>
+  
 <dialog id="login"><form method="dialog" id="lf">
  <h2 style="margin-top:0">Redaktørlogin</h2>
  <label for="lemail">E-mailadresse</label><input type="email" id="lemail" autocomplete="username" required>
@@ -1152,7 +1226,8 @@ function prev(){
 }
   
   document.addEventListener("DOMContentLoaded", () => {
-function side(){
+
+  function side(){
   const h = location.hash;
   const k = h === "#kontakt";
   const a = h === "#aktiviteter";
@@ -1163,22 +1238,20 @@ function side(){
   $("sideAktiviteter").hidden = !a;
   $("sideFotos").hidden = !f;
   
+  // Opdater de gamle knapper (hvis de bruges)
   $("fOpslag").classList.toggle("on", !k && !a && !f);
   $("fKontakt").classList.toggle("on", k);
   $("fAktiviteter").classList.toggle("on", a);
   $("fFotos").classList.toggle("on", f);
   
+  // Opdater de nye bundknapper
+  $("bOpslag").classList.toggle("on", !k && !a && !f);
+  $("bKontakt").classList.toggle("on", k);
+  $("bAktiviteter").classList.toggle("on", a);
+  $("bFotos").classList.toggle("on", f);
+  
   scrollTo(0,0);
 }
-
-$("fOpslag").onclick = () => { location.hash = "opslag"; };
-$("fAktiviteter").onclick = () => { location.hash = "aktiviteter"; };
-$("fFotos").onclick = () => { location.hash = "fotos"; };
-$("fKontakt").onclick = () => { location.hash = "kontakt"; };
-
-addEventListener("hashchange", side);
-side();
-
   /* Swipe navigation */
   let touchstartX = 0;
   let touchendX = 0;
