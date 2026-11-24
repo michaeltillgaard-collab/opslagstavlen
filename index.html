@@ -181,9 +181,12 @@ dialog{border:0;border-radius:1rem;padding:1.3rem;max-width:26rem;width:92%}dial
 }
 
 /* Den aktive knap bliver blå */
-.bundmenu button.on {
-  color: var(--hav); /* Bruger din eksisterende blå farve */
-  background: transparent;
+bundmenu button.on {
+  color: var(--hav) !important;
+  background: transparent !important;
+}
+.bundmenu button.on .ikon {
+  transform: scale(1.1); /* En lille bonus: ikonet bliver en anelse større */
 }
 
 /* Sørg for at indholdet i main ikke gemmer sig bag bundmenuen */
