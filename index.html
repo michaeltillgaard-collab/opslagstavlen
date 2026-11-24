@@ -1227,61 +1227,59 @@ function prev(){
   
   document.addEventListener("DOMContentLoaded", () => {
 
+  function side(){
+    const h = location.hash;
+    const k = h === "#kontakt";
+    const a = h === "#aktiviteter";
+    const f = h === "#fotos";
+    
+    $("sideOpslag").hidden = k || a || f;
+    $("sideKontakt").hidden = !k;
+    $("sideAktiviteter").hidden = !a;
+    $("sideFotos").hidden = !f;
+    
+    // Opdater de gamle knapper (kun hvis de findes)
+    if ($("fOpslag")) $("fOpslag").classList.toggle("on", !k && !a && !f);
+    if ($("fKontakt")) $("fKontakt").classList.toggle("on", k);
+    if ($("fAktiviteter")) $("fAktiviteter").classList.toggle("on", a);
+    if ($("fFotos")) $("fFotos").classList.toggle("on", f);
+    
+    // Opdater de nye bundknapper
+    if ($("bOpslag")) $("bOpslag").classList.toggle("on", !k && !a && !f);
+    if ($("bKontakt")) $("bKontakt").classList.toggle("on", k);
+    if ($("bAktiviteter")) $("bAktiviteter").classList.toggle("on", a);
+    if ($("bFotos")) $("bFotos").classList.toggle("on", f);
+    
+    scrollTo(0,0);
+  }
 
-function side(){
-  const h = location.hash;
-  const k = h === "#kontakt";
-  const a = h === "#aktiviteter";
-  const f = h === "#fotos";
-  
-  $("sideOpslag").hidden = k || a || f;
-  $("sideKontakt").hidden = !k;
-  $("sideAktiviteter").hidden = !a;
-  $("sideFotos").hidden = !f;
-  
-  // Opdater de gamle knapper (hvis de bruges)
-  $("fOpslag").classList.toggle("on", !k && !a && !f);
-  $("fKontakt").classList.toggle("on", k);
-  $("fAktiviteter").classList.toggle("on", a);
-  $("fFotos").classList.toggle("on", f);
-  
-  // Opdater de nye bundknapper
-  $("bOpslag").classList.toggle("on", !k && !a && !f);
-  $("bKontakt").classList.toggle("on", k);
-  $("bAktiviteter").classList.toggle("on", a);
-  $("bFotos").classList.toggle("on", f);
-  
-  scrollTo(0,0);
-}
+  // --- KLIK-EVENTS ---
 
-// --- KLIK-EVENTS ---
+  // Gamle knapper (i toppen)
+  if ($("fOpslag")) $("fOpslag").onclick = () => { location.hash = "opslag"; };
+  if ($("fAktiviteter")) $("fAktiviteter").onclick = () => { location.hash = "aktiviteter"; };
+  if ($("fFotos")) $("fFotos").onclick = () => { location.hash = "fotos"; };
+  if ($("fKontakt")) $("fKontakt").onclick = () => { location.hash = "kontakt"; };
 
-// Gamle knapper (i toppen)
-$("fOpslag").onclick = () => { location.hash = "opslag"; };
-$("fAktiviteter").onclick = () => { location.hash = "aktiviteter"; };
-$("fFotos").onclick = () => { location.hash = "fotos"; };
-$("fKontakt").onclick = () => { location.hash = "kontakt"; };
+  // Nye bundknapper
+  if ($("bOpslag")) $("bOpslag").onclick = () => { location.hash = "opslag"; };
+  if ($("bAktiviteter")) $("bAktiviteter").onclick = () => { location.hash = "aktiviteter"; };
+  if ($("bFotos")) $("bFotos").onclick = () => { location.hash = "fotos"; };
+  if ($("bKontakt")) $("bKontakt").onclick = () => { location.hash = "kontakt"; };
 
-// Nye bundknapper
-$("bOpslag").onclick = () => { location.hash = "opslag"; };
-$("bAktiviteter").onclick = () => { location.hash = "aktiviteter"; };
-$("bFotos").onclick = () => { location.hash = "fotos"; };
-$("bKontakt").onclick = () => { location.hash = "kontakt"; };
   /* Swipe navigation */
   let touchstartX = 0;
   let touchendX = 0;
-  const sw = 75; // Minimum antal pixels fingeren skal flyttes (for at undgå at trigger ved et let tryk)
+  const sw = 75; 
 
   function checkSwipe() {
     if (touchendX < touchstartX - sw) {
-      // Swipede mod venstre (fingeren gik mod højre) -> Gå til næste
       if (location.hash === "" || location.hash === "#opslag") location.hash = "aktiviteter";
       else if (location.hash === "#aktiviteter") location.hash = "fotos";
       else if (location.hash === "#fotos") location.hash = "kontakt";
     }
     
     if (touchendX > touchstartX + sw) {
-      // Swipede mod højre (fingeren gik mod venstre) -> Gå til forrige
       if (location.hash === "#kontakt") location.hash = "fotos";
       else if (location.hash === "#fotos") location.hash = "aktiviteter";
       else if (location.hash === "#aktiviteter") location.hash = "opslag";
@@ -1296,7 +1294,12 @@ $("bKontakt").onclick = () => { location.hash = "kontakt"; };
     touchendX = e.changedTouches[0].screenX;
     checkSwipe();
   }, { passive: true });
-    
+
+  // --- DET HER MANGLEDE ---
+  addEventListener("hashchange", side);
+  side();
+
+});
 function visD(){$("dbox").hidden=!$("harD").checked}
 $("harD").onchange=visD;
 $("rydDato").onclick = () => {
