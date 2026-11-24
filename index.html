@@ -181,12 +181,12 @@ dialog{border:0;border-radius:1rem;padding:1.3rem;max-width:26rem;width:92%}dial
 }
 
 /* Den aktive knap bliver blå */
-bundmenu button.on {
+.bundmenu button.on {
   color: var(--hav) !important;
   background: transparent !important;
 }
 .bundmenu button.on .ikon {
-  transform: scale(1.1); /* En lille bonus: ikonet bliver en anelse større */
+  transform: scale(1.1);
 }
 
 /* Sørg for at indholdet i main ikke gemmer sig bag bundmenuen */
@@ -1231,30 +1231,32 @@ function prev(){
   document.addEventListener("DOMContentLoaded", () => {
 
   function side(){
-    const h = location.hash;
-    const k = h === "#kontakt";
-    const a = h === "#aktiviteter";
-    const f = h === "#fotos";
-    
-    $("sideOpslag").hidden = k || a || f;
-    $("sideKontakt").hidden = !k;
-    $("sideAktiviteter").hidden = !a;
-    $("sideFotos").hidden = !f;
-    
-    // Opdater de gamle knapper (kun hvis de findes)
-    if ($("fOpslag")) $("fOpslag").classList.toggle("on", !k && !a && !f);
-    if ($("fKontakt")) $("fKontakt").classList.toggle("on", k);
-    if ($("fAktiviteter")) $("fAktiviteter").classList.toggle("on", a);
-    if ($("fFotos")) $("fFotos").classList.toggle("on", f);
-    
-    // Opdater de nye bundknapper
-    if ($("bOpslag")) $("bOpslag").classList.toggle("on", !k && !a && !f);
-    if ($("bKontakt")) $("bKontakt").classList.toggle("on", k);
-    if ($("bAktiviteter")) $("bAktiviteter").classList.toggle("on", a);
-    if ($("bFotos")) $("bFotos").classList.toggle("on", f);
-    
-    scrollTo(0,0);
-  }
+  const h = location.hash;
+  const k = h === "#kontakt";
+  const a = h === "#aktiviteter";
+  const f = h === "#fotos";
+  
+  $("sideOpslag").hidden = k || a || f;
+  $("sideKontakt").hidden = !k;
+  $("sideAktiviteter").hidden = !a;
+  $("sideFotos").hidden = !f;
+  
+  // Gamle knapper
+  const fOpslag = $("fOpslag"), fKontakt = $("fKontakt"), fAktiviteter = $("fAktiviteter"), fFotos = $("fFotos");
+  if (fOpslag) fOpslag.classList.toggle("on", !k && !a && !f);
+  if (fKontakt) fKontakt.classList.toggle("on", k);
+  if (fAktiviteter) fAktiviteter.classList.toggle("on", a);
+  if (fFotos) fFotos.classList.toggle("on", f);
+  
+  // Nye bundknapper
+  const bOpslag = $("bOpslag"), bKontakt = $("bKontakt"), bAktiviteter = $("bAktiviteter"), bFotos = $("bFotos");
+  if (bOpslag) bOpslag.classList.toggle("on", !k && !a && !f);
+  if (bKontakt) bKontakt.classList.toggle("on", k);
+  if (bAktiviteter) bAktiviteter.classList.toggle("on", a);
+  if (bFotos) bFotos.classList.toggle("on", f);
+  
+  scrollTo(0,0);
+}
 
   // --- KLIK-EVENTS ---
 
