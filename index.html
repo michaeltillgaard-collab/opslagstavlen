@@ -1227,7 +1227,8 @@ function prev(){
   
   document.addEventListener("DOMContentLoaded", () => {
 
-  function side(){
+
+function side(){
   const h = location.hash;
   const k = h === "#kontakt";
   const a = h === "#aktiviteter";
@@ -1252,6 +1253,20 @@ function prev(){
   
   scrollTo(0,0);
 }
+
+// --- KLIK-EVENTS ---
+
+// Gamle knapper (i toppen)
+$("fOpslag").onclick = () => { location.hash = "opslag"; };
+$("fAktiviteter").onclick = () => { location.hash = "aktiviteter"; };
+$("fFotos").onclick = () => { location.hash = "fotos"; };
+$("fKontakt").onclick = () => { location.hash = "kontakt"; };
+
+// Nye bundknapper
+$("bOpslag").onclick = () => { location.hash = "opslag"; };
+$("bAktiviteter").onclick = () => { location.hash = "aktiviteter"; };
+$("bFotos").onclick = () => { location.hash = "fotos"; };
+$("bKontakt").onclick = () => { location.hash = "kontakt"; };
   /* Swipe navigation */
   let touchstartX = 0;
   let touchendX = 0;
