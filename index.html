@@ -167,19 +167,19 @@ dialog{border:0;border-radius:1rem;padding:1.3rem;max-width:26rem;width:92%}dial
   justify-content: center;
   background: transparent;
   border: none;
-  color: #64748b; /* Grå tekst/ikoner når de ikke er aktive */
-  font-size: 0.75rem;
+  color: #64748b; 
+  font-size: 0.9rem; /* <-- Øget fra 0.75rem til 0.9rem */
   font-weight: 600;
-  padding: 0.6rem 0.2rem;
+  padding: 0.4rem 0.2rem; /* Lidt mindre luft i toppen/bunden */
   min-height: 4rem;
-  border-radius: 0; /* Fjerne de runde knap-hjørner */
+  border-radius: 0.6rem; /* Giver knappen runde hjørner, når den bliver blå */
   cursor: pointer;
   transition: color 0.2s;
 }
 
 .bundmenu button .ikon {
-  font-size: 1.4rem;
-  margin-bottom: 0.2rem;
+  font-size: 1.15rem; /* <-- Sænket fra 1.4rem til 1.15rem */
+  margin-bottom: 0.1rem; /* Mindre luft mellem ikon og tekst */
 }
 
 /* Den aktive knap bliver blå */
