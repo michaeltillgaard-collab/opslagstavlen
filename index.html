@@ -183,16 +183,13 @@ dialog{border:0;border-radius:1rem;padding:1.3rem;max-width:26rem;width:92%}dial
 }
 
 /* Den aktive knap bliver blå */
-.bundmenu button.on span {
-  color: #1e3a8a !important;
-}
-
-/* Tvinger tekst og ikon til at være blåt, uanset hvad resten af siden siger */
+/* Den endelige regel for den aktive bundmenu */
+.bundmenu button.on,
 .bundmenu button.on span,
 .bundmenu button.on .ikon {
-  color: #1e3a8a !important;
-  fill: #1e3a8a !important;
-  transform: scale(1.1);
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  transform: none !important; /* Fjerner al skalering */
 }
 
 /* Sørg for at indholdet i main ikke gemmer sig bag bundmenuen */
