@@ -554,7 +554,7 @@ footer{
  
 </dialog>
 <dialog id="privat">
-<h2>Om denne app og dine oplysninger</h2>
+<h2 tabindex="-1" autofocus style="outline:none">Om denne app og dine oplysninger</h2>
 
 <h3>Dataansvarlig</h3>
 <p>Appen drives af <b id="pa"></b>. Ansvarshavende redaktør: <b id="pk"></b>. Har du spørgsmål til, hvordan dine oplysninger behandles, er du velkommen til at kontakte mig på den angivne e-mailadresse.</p>
@@ -1549,7 +1549,7 @@ $("fil").onchange=async e=>{
   catch(x){$("afejl").textContent=x.message}
   prev();
 };
-$("omdata").onclick=()=>{$("pa").textContent=K.dataansvarlig||"[dataansvarlig udfyldes i config.js]";$("pk").textContent=K.kontakt||"[kontaktoplysninger udfyldes i config.js]";$("privat").showModal()};
+$("omdata").onclick=()=>{$("pa").textContent=K.dataansvarlig||"[dataansvarlig udfyldes i config.js]";$("pk").textContent=K.kontakt||"[kontaktoplysninger udfyldes i config.js]";$("privat").showModal();$("privat").scrollTop=0;requestAnimationFrame(()=>{$("privat").scrollTop=0})};
 $("privatluk").onclick=()=>$("privat").close();
 $("luk").onclick=()=>$("foto").close();
 $("foto").onclick=e=>{if(e.target===$("foto"))$("foto").close()};
