@@ -709,7 +709,11 @@ function vis(){
   l.replaceChildren(...v.slice((sideNr-1)*PR_SIDE,sideNr*PR_SIDE).map(o=>{
     const mk=markering[nok(o)],a=el("article",(o.fastgjort?"pin ":"")+(mk?"ny ":"")+"k-"+(o.kategori||"info"));
     a.dataset.id=o.id;a.dataset.ver=ver(o);
-    if(o.fastgjort)a.append(el("div","pt","📌 Fastgjort"));
+    if(o.fastgjort){
+  const pDiv = el("div","pt");
+  pDiv.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom; margin-right:4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>Fastgjort`;
+  a.append(pDiv);
+}
     if(o.arkiveret){
   const aDiv = el("div","pt");
   aDiv.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom; margin-right:4px;"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>Arkiveret`;
