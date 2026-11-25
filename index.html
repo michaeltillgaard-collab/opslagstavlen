@@ -292,12 +292,20 @@ footer{text-align:center;font-size:.75rem;color:#64748b;padding:1.5rem 1rem}
   <h2 id="ah">Opret nyt opslag (kun redaktører)</h2>
   <label for="t">Overskrift</label><input type="text" id="t" maxlength="120">
   <label for="k">Kategori</label>
-  <select id="k">
-  <option value="vigtigt">Vigtigt / haster</option>
-  <option value="arrangement">Arrangement / fællesskab</option>
-  <option value="vedligehold">Vedligehold og drift</option>
-  <option value="info" selected>Generel information</option>
-</select>
+
+<div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.25rem;">
+  <span id="k-ikon" style="display:flex; align-items:center; color:#1e293b;">
+    <!-- Standard ikonet (Info) vises fra start -->
+    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+  </span>
+  <select id="k" style="flex:1;">
+    <option value="vigtigt">Vigtigt / haster</option>
+    <option value="arrangement">Arrangement / fællesskab</option>
+    <option value="vedligehold">Vedligehold og drift</option>
+    <option value="info" selected>Generel information</option>
+  </select>
+</div>
+   
   <label class="chk"><input type="checkbox" id="harD"> 📅 Opslaget har en dato (fx et arrangement)</label>
   <div id="dbox" hidden>
    <label for="ad">Dato</label><input type="date" id="ad">
@@ -573,6 +581,27 @@ const K=window.KONFIG,$=id=>document.getElementById(id);
 const KAT={vigtigt:"Vigtigt",arrangement:"Arrangement",vedligehold:"Vedligehold",info:"Information"};
 let opslag=[],filter="alle",kode=false,rolleNavn=null,bruger=null,valgte=[],eksist=[],redigerId=null,kontakter=[],kred=null,sideNr=1, aktiviteter={};
 const PR_SIDE=10;
+
+/* Skift ikon, når man vælger kategori */
+document.addEventListener("DOMContentLoaded", () => {
+  const ikoner = {
+    vigtigt: `<svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
+    arrangement: `<svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`,
+    vedligehold: `<svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>`,
+    info: `<svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`
+  };
+  const skiftIkon = (valg) => {
+    const el = document.getElementById("k-ikon");
+    if (el) el.innerHTML = ikoner[valg] || ikoner.info;
+  };
+  
+  const drop = document.getElementById("k");
+  if (drop) {
+    drop.addEventListener("change", (e) => skiftIkon(e.target.value));
+    skiftIkon(drop.value); // Sæt det rigtige ikon ved start
+  }
+});
+  
 /* "Nyt"-markering: husker på denne enhed, hvilke opslag der er set */
 let sete=null;try{const x=localStorage.getItem("sete");sete=x?JSON.parse(x):null}catch(e){}
 const foerste=!sete||typeof sete!=="object";if(foerste)sete={};
