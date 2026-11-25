@@ -712,22 +712,16 @@ function vis(){
     if(o.arkiveret)a.append(el("div","pt","📦 Arkiveret"));
     const m=el("div","meta");
     
-    const ikon = KAT_IKONER[o.kategori] || KAT_IKONER.info;
-m.append(
+      const ikon = KAT_IKONER[o.kategori] || KAT_IKONER.info;
+  const sIkon = el("span");
+  sIkon.innerHTML = ikon;
 
-const sIkon = el("span");
-sIkon.innerHTML = ikon;
-
-m.append(
-  el("span","badge",""), 
-  sIkon, 
-  el("span","", "· oprettet d. "+dato(o.oprettet)+(o.redigeret?" (rettet d. "+dato(o.redigeret)+")":"")), 
-  el("span","","Fra: "+(o.afsender||""))
-);
-  el("span","", ikon), 
-  el("span","", "· oprettet d. "+dato(o.oprettet)+(o.redigeret?" (rettet d. "+dato(o.redigeret)+")":"")), 
-  el("span","","Fra: "+(o.afsender||""))
-);
+  m.append(
+    el("span","badge",""), 
+    sIkon, 
+    el("span","", "· oprettet d. "+dato(o.oprettet)+(o.redigeret?" (rettet d. "+dato(o.redigeret)+")":"")), 
+    el("span","","Fra: "+(o.afsender||""))
+  );
     
     if(mk)m.firstChild.prepend(el("span","nyt"+(mk==="RETTET"?" rettet":""),mk));
     a.append(m,el("h3","",o.titel));
