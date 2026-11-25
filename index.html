@@ -292,7 +292,12 @@ footer{text-align:center;font-size:.75rem;color:#64748b;padding:1.5rem 1rem}
   <h2 id="ah">Opret nyt opslag (kun redaktører)</h2>
   <label for="t">Overskrift</label><input type="text" id="t" maxlength="120">
   <label for="k">Kategori</label>
-  <select id="k"><option value="vigtigt">🚨 Vigtigt / haster</option><option value="arrangement">🎉 Arrangement / fællesskab</option><option value="vedligehold">🛠️ Vedligehold og drift</option><option value="info" selected>📢 Generel information</option></select>
+  <select id="k">
+  <option value="vigtigt">Vigtigt / haster</option>
+  <option value="arrangement">Arrangement / fællesskab</option>
+  <option value="vedligehold">Vedligehold og drift</option>
+  <option value="info" selected>Generel information</option>
+</select>
   <label class="chk"><input type="checkbox" id="harD"> 📅 Opslaget har en dato (fx et arrangement)</label>
   <div id="dbox" hidden>
    <label for="ad">Dato</label><input type="date" id="ad">
@@ -565,7 +570,7 @@ footer{text-align:center;font-size:.75rem;color:#64748b;padding:1.5rem 1rem}
 <script>
 const K=window.KONFIG,$=id=>document.getElementById(id);
   firebase.initializeApp(K.firebase);
-const KAT={vigtigt:"🚨 Vigtigt",arrangement:"🎉 Arrangement",vedligehold:"🛠️ Vedligehold",info:"📢 Information"};
+const KAT={vigtigt:"Vigtigt",arrangement:"Arrangement",vedligehold:"Vedligehold",info:"Information"};
 let opslag=[],filter="alle",kode=false,rolleNavn=null,bruger=null,valgte=[],eksist=[],redigerId=null,kontakter=[],kred=null,sideNr=1, aktiviteter={};
 const PR_SIDE=10;
 /* "Nyt"-markering: husker på denne enhed, hvilke opslag der er set */
