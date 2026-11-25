@@ -216,7 +216,13 @@ button.lnk{background:none;color:var(--hav);text-decoration:underline;min-height
 .lr{font-size:.8rem;border-bottom:1px solid #e2e8f0;padding:.35rem 0;overflow-wrap:anywhere}#styr{max-width:40rem;max-height:90vh;overflow:auto}#styr h3{font-size:1rem;margin:1rem 0 .3rem}
 #lfejl:empty{display:none}
 a.mail{display:block;padding:.45rem 0;font-weight:700;overflow-wrap:anywhere;color:var(--link)}
-footer{text-align:center;font-size:.75rem;color:#64748b;padding:1.5rem 1rem}
+footer{
+  text-align:center;
+  font-size:.8rem; /* Lidt større tekst */
+  color:#64748b;
+  padding: 2rem 1rem 7rem 1rem; /* Masser af luft i bunden, så den ikke gemmer sig bag bundmenuen */
+  margin-top: 2rem; /* Afstand til indholdet ovenover */
+}
  /* Tilpasning når telefonen holdes i liggende stilling (landscape) */
 @media (orientation: landscape) and (max-height: 600px) {
   header .in { padding: .3rem 1rem; }
@@ -474,7 +480,11 @@ footer{text-align:center;font-size:.75rem;color:#64748b;padding:1.5rem 1rem}
   <div style="text-align: center; margin: 1.5rem 1rem 0;">
   <button class="rav" id="rolle-bund" style="width: 100%; max-width: 30rem;">Log ind som redaktør</button>
 </div>
-<footer>© 2026 Strandhusene - Afdeling 55 – seniorbofællesskab<br><button type="button" class="lnk" id="omdata">Om appen og dine data</button></footer>
+<footer style="padding-bottom: 6rem; padding-top: 2rem; line-height: 1.8;">
+  <div>© 2026 Strandhusene - Afdeling 55</div>
+  <div style="font-size: 0.85rem; margin-top: 0.2rem;">Seniorbofællesskab</div>
+  <button type="button" class="lys" id="omdata" style="margin-top: 0.8rem; font-size: 0.85rem; padding: 0.4rem 1rem;">Om appen og dine data</button>
+</footer>
 
 <nav class="bundmenu" aria-label="Bundmenu">
   <button id="bOpslag" class="on">
