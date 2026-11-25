@@ -698,6 +698,7 @@ function pager(n){
 }
 $("pf").onclick=()=>{sideNr--;vis();scrollTo({top:0,behavior:"smooth"})};
 $("pn").onclick=()=>{sideNr++;vis();scrollTo({top:0,behavior:"smooth"})};
+
 function vis(){
   const l=$("liste");
   marker();
@@ -712,16 +713,27 @@ function vis(){
     if(o.arkiveret)a.append(el("div","pt","📦 Arkiveret"));
     const m=el("div","meta");
     
-      const ikon = KAT_IKONER[o.kategori] || KAT_IKONER.info;
-  const sIkon = el("span");
-  sIkon.innerHTML = ikon;
+const ikon = KAT_IKONER[o.kategori] || KAT_IKONER.info;
+const sIkon = el("span");
+sIkon.innerHTML = ikon;
+sIkon.style.display = "inline-flex";
+sIkon.style.alignItems = "center";
+sIkon.style.marginRight = "4px";
 
-  m.append(
-    el("span","badge",""), 
-    sIkon, 
-    el("span","", "· oprettet d. "+dato(o.oprettet)+(o.redigeret?" (rettet d. "+dato(o.redigeret)+")":"")), 
-    el("span","","Fra: "+(o.afsender||""))
-  );
+// Vi pakker ikonet og datoen ind i en fælles boks (venstre side)
+const venstre = el("span");
+venstre.style.display = "inline-flex";
+venstre.style.alignItems = "center";
+venstre.append(
+  sIkon,
+  el("span", "", "oprettet d. "+dato(o.oprettet)+(o.redigeret?" (rettet d. "+dato(o.redigeret)+")":""))
+);
+
+m.append(
+  el("span","badge",""), // Tom span
+  venstre,               // Vores nye samlede venstre-side
+  el("span","","Fra: "+(o.afsender||"")) // Højre side
+);
     
     if(mk)m.firstChild.prepend(el("span","nyt"+(mk==="RETTET"?" rettet":""),mk));
     a.append(m,el("h3","",o.titel));
