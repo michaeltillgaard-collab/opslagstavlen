@@ -1509,15 +1509,31 @@ function arrBox(o){
     forbi=r.dato<idag();
   }
   
-  let t=d.toLocaleDateString("da-DK",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+    let t=d.toLocaleDateString("da-DK",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
   t=t.charAt(0).toUpperCase()+t.slice(1)+(r.tid?" kl. "+r.tid.replace(":","."):"");
-  const b=el("div","arr"+(forbi?" forbi":""));
-  b.append(el("div","dato",(forbi?"✔️ Afholdt: ":"📅 ")+t));
-  if(r.sted)b.append(el("div","sted","📍 "+r.sted));
+  
+  const b = el("div","arr"+(forbi?" forbi":""));
+  
+  // Dato med ikon (grønt flueben eller kalender)
+  const ikonDato = forbi 
+    ? `<svg viewBox="0 0 24 24" width="16" height="16" stroke="#065f46" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom; margin-right:4px;"><polyline points="20 6 9 17 4 12"></polyline></svg>`
+    : `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom; margin-right:4px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
+  
+  const dDiv = el("div","dato");
+  dDiv.innerHTML = ikonDato + (forbi ? "Afholdt: " : "") + t;
+  b.append(dDiv);
+  
+  // Sted med ikon
+  if(r.sted) {
+    const sDiv = el("div","sted");
+    sDiv.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom; margin-right:4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>` + r.sted;
+    b.append(sDiv);
+  }
   
   // Vis kun kalenderknappen, hvis arrangementet IKKE er afholdt
   if(!forbi){
-    const k=el("button","kal lys2","📅 Tilføj til kalender");
+    const k = el("button","kal lys2");
+    k.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom; margin-right:6px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg> Tilføj til kalender`;
     k.onclick=()=>ics(o);
     b.append(k);
   }
