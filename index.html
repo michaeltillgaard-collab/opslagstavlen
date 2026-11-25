@@ -1135,7 +1135,11 @@ function visKontakt(){
     const k=el("div","kort");
     k.append(el("b","",c.navn||""));
     if(c.rolle)k.append(el("div","",c.rolle));
-    if(c.tid)k.append(el("div","status","🕘 "+c.tid));
+    if(c.tid){
+  const tidDiv = el("div","status");
+  tidDiv.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom; margin-right:4px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>` + c.tid;
+  k.append(tidDiv);
+}
     if(c.telefon){const a=el("a","ring","📞 Ring "+c.telefon);a.href="tel:"+c.telefon.replace(/[^\d+]/g,"");k.append(a)}
     return k}):[el("p","tom","Der er ikke tilføjet kontaktoplysninger endnu.")]));
   $("kret").hidden=!kode||kred!==null;
