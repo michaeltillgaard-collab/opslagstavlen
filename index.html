@@ -710,7 +710,11 @@ function vis(){
     const mk=markering[nok(o)],a=el("article",(o.fastgjort?"pin ":"")+(mk?"ny ":"")+"k-"+(o.kategori||"info"));
     a.dataset.id=o.id;a.dataset.ver=ver(o);
     if(o.fastgjort)a.append(el("div","pt","📌 Fastgjort"));
-    if(o.arkiveret)a.append(el("div","pt","📦 Arkiveret"));
+    if(o.arkiveret){
+  const aDiv = el("div","pt");
+  aDiv.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom; margin-right:4px;"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>Arkiveret`;
+  a.append(aDiv);
+}
     const m=el("div","meta");
     
 const ikon = KAT_IKONER[o.kategori] || KAT_IKONER.info;
