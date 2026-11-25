@@ -218,10 +218,10 @@ button.lnk{background:none;color:var(--hav);text-decoration:underline;min-height
 a.mail{display:block;padding:.45rem 0;font-weight:700;overflow-wrap:anywhere;color:var(--link)}
 footer{
   text-align:center;
-  font-size:.8rem; /* Lidt større tekst */
+  font-size:.8rem; 
   color:#64748b;
-  padding: 2rem 1rem 7rem 1rem; /* Masser af luft i bunden, så den ikke gemmer sig bag bundmenuen */
-  margin-top: 2rem; /* Afstand til indholdet ovenover */
+  padding: 0.5rem 1rem 7rem 1rem; /* <-- Top-padding sat ned fra 2rem til 0.5rem */
+  margin-top: 0; /* <-- Margin fjernet helt */
 }
  /* Tilpasning når telefonen holdes i liggende stilling (landscape) */
 @media (orientation: landscape) and (max-height: 600px) {
@@ -477,7 +477,7 @@ footer{
  </section>
 </div>
 </main>
-  <div style="text-align: center; margin: 1.5rem 1rem 0;">
+  <div style="text-align: center; margin: 1rem 1rem 1rem;">
   <button class="rav" id="rolle-bund" style="width: 100%; max-width: 30rem;">Log ind som redaktør</button>
 </div>
 <footer style="padding-bottom: 6rem; padding-top: 2rem; line-height: 1.8;">
