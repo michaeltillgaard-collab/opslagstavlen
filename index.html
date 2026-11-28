@@ -2,6 +2,9 @@
 <html lang="da"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Afdeling 55 Strandhusene - Opslagstavle</title>
+<meta name="description" content="Digital opslagstavle, ugentlige aktiviteter, fotoalbums og kontaktoplysninger for seniorbofællesskabet Strandhusene Afdeling 55.">
+<meta property="og:title" content="Afdeling 55 Strandhusene - Opslagstavle">
+<meta property="og:description" content="Digital opslagstavle, ugentlige aktiviteter, fotoalbums og kontaktoplysninger for seniorbofællesskabet Strandhusene Afdeling 55.">
 <link rel="manifest" href="manifest.json">
   <style>/* CACHE BUSTER */</style>
   <meta name="theme-color" content="#1e3a8a">
@@ -255,50 +258,95 @@ footer{
   -webkit-text-fill-color: #ffffff !important;
 }
 
-/* ===== PRINT STYLES ===== */
-@media print {
-  /* Skjul alt standard-indhold */
-  body * {
-    visibility: hidden;
-  }
-  
-  /* Gør kun det valgte opslag synligt */
-  .print-aktiv,
-  .print-aktiv * {
-    visibility: visible;
-  }
-  
-  /* Placer opslaget pænt i toppen af siden */
-  .print-aktiv {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    border: none;
-    box-shadow: none;
-  }
-  
-  /* Skjul knapper og andet unødvendigt i selve opslaget */
-  .print-aktiv .slet,
-  .print-aktiv .pt {
-    display: none !important;
-  }
-  
-  /* Gør teksten nem at læse på papir (sort i stedet for grå) */
-  .print-aktiv p,
-  .print-aktiv h3 {
-    color: #000 !important;
-  }
-  
-  /* Sørg for, at billeder ikke bliver klippet af */
-  .print-aktiv img {
-    max-width: 100% !important;
-    page-break-inside: avoid;
-  }
+.opslag-akt {
+  margin-top: .85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
 }
 
+button.print-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  background: #f8fafc;
+  color: var(--hav);
+  border: 1px solid #cbd5e1;
+  min-height: 2.5rem;
+  padding: .35rem .85rem;
+  font-size: .88rem;
+  font-weight: 600;
+}
+
+button.print-btn:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+.print-only-header {
+  display: none;
+}
+
+@media print {
+  @page {
+    margin: 1.5cm;
+  }
+  body {
+    background: #fff !important;
+    color: #0f172a !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  header,
+  footer,
+  nav.bundmenu,
+  .bar,
+  #pushbar,
+  #admin,
+  #konto,
+  #pager,
+  #sideOpslag > h2,
+  #sideOpslag > .status,
+  dialog,
+  .slet,
+  .opslag-akt,
+  .arr .kal,
+  .nyt {
+    display: none !important;
+  }
+  .print-only-header {
+    display: block !important;
+    font-size: .85rem;
+    font-weight: 600;
+    color: #475569;
+    border-bottom: 1px solid #cbd5e1;
+    padding-bottom: .4rem;
+    margin-bottom: 1rem;
+  }
+  main {
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  body.printing-single #liste > article:not(.print-target) {
+    display: none !important;
+  }
+  article {
+    box-shadow: none !important;
+    margin: 0 0 1rem 0 !important;
+    border-color: #cbd5e1 !important;
+    break-inside: avoid;
+  }
+  article.pin {
+    box-shadow: none !important;
+    border-color: #f59e0b !important;
+  }
+  .fotos img {
+    max-height: 12cm;
+    object-fit: contain;
+    break-inside: avoid;
+  }
+}
 </style>
 </head>
   <body>
@@ -330,6 +378,7 @@ footer{
   
   
   <div id="sideOpslag">
+   <div class="print-only-header">Afdeling 55 Strandhusene · Opslagstavle</div>
    <h2 style="margin:.2rem 0 1rem">Opslagstavlen</h2>
   <p class="status" style="margin-bottom:1rem;font-size:1.5rem"></p>
  <div class="bar" id="pushbar">
@@ -855,24 +904,20 @@ m.append(
     
     if(mk)m.firstChild.prepend(el("span","nyt"+(mk==="RETTET"?" rettet":""),mk));
     a.append(m,el("h3","",o.titel));
-
-    // Print-knap til alle
-    const p = el("button","lys");
-    p.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom; margin-right:4px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>Udskriv`;
-    p.style.marginTop = "10px";
-    p.onclick = () => {
-      a.classList.add("print-aktiv");
-      window.print();
-      a.classList.remove("print-aktiv");
-    };
-    a.append(p);
-    
     a.append(el("p","",o.tekst));
     if(o.arrangement&&o.arrangement.dato && typeof arrBox === "function")a.append(arrBox(o));
     const bl=(o.billeder||[]).filter(x=>x&&typeof x.url==="string"&&x.url.startsWith("https://firebasestorage.googleapis.com/"));
     if(bl.length){const g=el("div","fotos");bl.forEach(x=>{const i=document.createElement("img");
       i.src=x.url;i.loading="lazy";i.alt="Billede til opslaget: "+(o.titel||"");
       i.onclick=()=>{$("stor").src=x.url;$("stor").alt=i.alt;$("foto").showModal()};g.append(i)});a.append(g)}
+    const aktDiv=el("div","opslag-akt");
+    const printBtn=el("button","print-btn");
+    printBtn.type="button";
+    printBtn.setAttribute("aria-label","Udskriv opslag: "+(o.titel||""));
+    printBtn.innerHTML=`<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg><span>Udskriv</span>`;
+    printBtn.onclick=()=>udskrivOpslag(a);
+    aktDiv.append(printBtn);
+    a.append(aktDiv);
     if(kode){
       const d=el("div","slet");
       
@@ -896,23 +941,24 @@ m.append(
       r.onclick=()=>{ if(typeof window.startRet === "function") window.startRet(o); };
       b.onclick=()=>slet(o.id);
       d.append(r,b);
-
-      // Print-knap (tilføjet til redaktør-knapperne for nemheds skyld, men kan flyttes)
-      const p = el("button","lys"); // Vi genbruger den lyse stil
-      p.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:4px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg><span style="display:block; font-size:0.75rem; line-height:1;">Print<br>opslag</span>`;
-      p.onclick = () => {
-        // Vi sætter en klasse på det valgte opslag, så CSS'en ved hvad der skal printes
-        a.classList.add("print-aktiv");
-        window.print();
-        a.classList.remove("print-aktiv");
-      };
-      d.append(p);
       
       a.append(d);
     }
     return a;
   }));
   if(obs){obs.disconnect();l.querySelectorAll("article").forEach(a=>obs.observe(a))}
+}
+function rydPrint(){
+  document.body.classList.remove("printing-single");
+  document.querySelectorAll("article.print-target").forEach(el=>el.classList.remove("print-target"));
+}
+window.addEventListener("afterprint",rydPrint);
+function udskrivOpslag(a){
+  rydPrint();
+  a.querySelectorAll("img[loading='lazy']").forEach(img=>{img.loading="eager"});
+  a.classList.add("print-target");
+  document.body.classList.add("printing-single");
+  window.print();
 }
 $("s").oninput=()=>{sideNr=1;vis()};
 $("chips").onclick=e=>{const f=e.target.dataset.f;if(!f)return;filter=f;sideNr=1;
