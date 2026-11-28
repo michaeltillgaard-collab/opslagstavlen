@@ -636,6 +636,17 @@ button.del-btn:hover {
     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom; margin-right:6px;"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
     Gem i arkiv (skjules fra den aktive liste)
   </label>
+
+  <label class="chk">
+    <input type="checkbox" id="harSkjul">
+    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom; margin-right:6px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+    Skjul automatisk efter dato
+  </label>
+  <div id="skjulbox" style="background:#fff;border:1px solid #fcd34d;border-radius:.6rem;padding:.2rem .8rem .8rem;margin-top:.4rem" hidden>
+    <label for="skjulDato">Sidste dag opslaget vises på forsiden</label>
+    <input type="date" id="skjulDato">
+    <p class="status" style="margin:.4rem 0 0;font-size:.8rem">Efter denne dato flyttes opslaget automatisk til Arkiv.</p>
+  </div>
   
   <label class="chk">
     <input type="checkbox" id="p" checked> 
@@ -1081,6 +1092,8 @@ const nok=o=>o.id+":"+ver(o);
 const obs="IntersectionObserver" in window?new IntersectionObserver(es=>es.forEach(e=>{const a=e.target;
   if(e.isIntersecting){timere.set(a,setTimeout(()=>{sete[a.dataset.id]=+a.dataset.ver;gemSete()},1500))}
   else{clearTimeout(timere.get(a));timere.delete(a)}}),{threshold:.15}):null;
+const erArkiveret = o => o.arkiveret === true || (typeof o.skjulEfter === "string" && /^\d{4}-\d{2}-\d{2}$/.test(o.skjulEfter) && o.skjulEfter < idag());
+
 function marker(){
   // Beregn grænsen for, hvornår et opslag må markeres som "nyt" (7 dage tilbage)
   const graense = Date.now() - 7 * 24 * 60 * 60 * 1000;
@@ -1090,8 +1103,8 @@ function marker(){
     if (!(k in markering)) {
       const v = sete[o.id];
       
-      // Hvis opslaget er arkiveret, skal det slet ikke markeres som nyt eller rettet
-      if (o.arkiveret) {
+      // Hvis opslaget er arkiveret (eller udløbet), skal det slet ikke markeres som nyt eller rettet
+      if (erArkiveret(o)) {
         markering[k] = "";
         return; // Spring resten af denne opslag over
       }
@@ -1105,8 +1118,8 @@ function marker(){
     }
   });
 
-  // Tæl kun de opslag, der faktisk vises i den aktive liste (dvs. ikke arkiverede)
-  const aktiveOpslag = opslag.filter(o => !o.arkiveret);
+  // Tæl kun de opslag, der faktisk vises i den aktive liste (dvs. ikke arkiverede/udløbne)
+  const aktiveOpslag = opslag.filter(o => !erArkiveret(o));
   const n = aktiveOpslag.filter(o => markering[nok(o)]).length;
   
   $("nye").hidden = !n;
@@ -1127,14 +1140,15 @@ const dato=ts=>ts?ts.toDate().toLocaleDateString("da-DK",{day:"numeric",month:"l
 function udvalg(){
   const q=$("s").value.toLowerCase();
   return opslag.filter(o => {
-    // Hvis filteret er "arkiv", vis KUN arkiverede opslag
+    const ark = erArkiveret(o);
+    // Hvis filteret er "arkiv", vis KUN arkiverede eller udløbne opslag
     if (filter === "arkiv") {
-      return o.arkiveret === true &&
+      return ark &&
         [o.titel,o.tekst,o.afsender].some(x=>(x||"").toLowerCase().includes(q));
     }
     
     // Ellers: Vis kun aktive opslag, der matcher filter og søgning
-    return o.arkiveret !== true &&
+    return !ark &&
       (filter==="alle"||o.kategori===filter) &&
       [o.titel,o.tekst,o.afsender].some(x=>(x||"").toLowerCase().includes(q));
   })
@@ -1174,7 +1188,7 @@ function vis(){
   pDiv.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom; margin-right:4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>Fastgjort`;
   a.append(pDiv);
 }
-    if(o.arkiveret){
+    if(erArkiveret(o)){
   const aDiv = el("div","pt");
   aDiv.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom; margin-right:4px;"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>Arkiveret`;
   a.append(aDiv);
@@ -1224,6 +1238,13 @@ m.append(
     delBtn.onclick=()=>aabnDel(o);
     aktDiv.append(printBtn,delBtn);
     a.append(aktDiv);
+    if(kode && o.skjulEfter && !erArkiveret(o)){
+      const sd = new Date(o.skjulEfter+"T12:00:00");
+      const skInfo = el("p","status","Skjules automatisk efter d. "+sd.toLocaleDateString("da-DK",{day:"numeric",month:"long",year:"numeric"}));
+      skInfo.style.fontSize = ".8rem";
+      skInfo.style.color = "#64748b";
+      a.append(skInfo);
+    }
     if(kode){
       const d=el("div","slet");
       
@@ -1490,6 +1511,7 @@ $("stilf").onclick = async () => {
 };
 $("udgiv").onclick = async () => {
   const harD = $("harD").checked;
+  const harSkjul = $("harSkjul").checked;
   const b = {
     handling: redigerId ? "ret" : "opret",
     dato: harD ? $("ad").value : "",
@@ -1501,6 +1523,7 @@ $("udgiv").onclick = async () => {
     kategori: $("k").value,
     fastgjort: $("f").checked,
     arkiveret: $("ark").checked, // <-- NYT
+    skjulEfter: harSkjul ? $("skjulDato").value : "",
     push: $("p").checked,
     billeder: valgte
   };
@@ -1516,6 +1539,10 @@ $("udgiv").onclick = async () => {
   }
   if (harD && !b.dato) {
     $("afejl").textContent = "Vælg en dato, eller fjern fluebenet ved dato.";
+    return;
+  }
+  if (harSkjul && !b.skjulEfter) {
+    $("afejl").textContent = "Vælg en dato for automatisk skjul, eller fjern fluebenet.";
     return;
   }
   
@@ -2002,6 +2029,13 @@ function prev(){
 
 });
 function visD(){$("dbox").hidden=!$("harD").checked}
+function visSkjul(){
+  $("skjulbox").hidden=!$("harSkjul").checked;
+  if($("harSkjul").checked && !$("skjulDato").value && $("harD").checked && $("ad").value){
+    $("skjulDato").value=$("ad").value;
+  }
+}
+$("harSkjul").onchange=visSkjul;
 $("harD").onchange=visD;
 $("rydDato").onclick = () => {
 $("harD").checked = false;
@@ -2062,6 +2096,7 @@ function arrBox(o){
   $("t").value=o.titel||"";$("b").value=o.tekst||"";$("a").value=o.afsender||"";$("k").value=o.kategori||"info";
   $("f").checked=!!o.fastgjort;
   $("ark").checked=!!o.arkiveret; // <-- NYT
+  $("harSkjul").checked=!!o.skjulEfter;$("skjulDato").value=o.skjulEfter||"";visSkjul();
   $("p").checked=false;
   const ar=o.arrangement;$("harD").checked=!!ar;$("ad").value=ar?ar.dato:"";$("at").value=ar&&ar.tid?ar.tid:"";$("as").value=ar&&ar.sted?ar.sted:"";visD();
   $("ah").textContent="Ret opslag";$("udgiv").textContent="Gem ændringer";$("annuller2").hidden=false;
@@ -2091,6 +2126,7 @@ window.stopRet = function() {
   $("b").value="";  
   $("f").checked=false;
   $("ark").checked=false; // <-- NYT
+  $("harSkjul").checked=false;$("skjulDato").value="";visSkjul();
   $("p").checked=true;
   $("harD").checked=false;$("ad").value="";$("at").value="";$("as").value="";visD();
   $("ah").textContent="Opret nyt opslag (kun redaktører)";$("udgiv").textContent="Udgiv opslag";$("annuller2").hidden=true;prev();
