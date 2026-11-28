@@ -28,6 +28,8 @@ button{cursor:pointer;border:0;border-radius:.6rem;min-height:2.8rem;padding:.4r
 button.rav{background:var(--rav);color:var(--nat)}button.lys{background:#fff;color:var(--tekst);border:2px solid #cbd5e1}
 button.fare{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;min-height:2.4rem;font-size:.8rem}
 .fs{display:flex;gap:.25rem}.fs button{min-height:2.2rem;padding:.1rem .6rem;background:#1e40af;font-size:.85rem}.fs button.on{background:#fff;color:var(--hav)}
+button.hjaelp-top{min-height:2.2rem;padding:.1rem .7rem;background:#1e40af;color:#fff;font-size:.85rem;border:1px solid #60a5fa55}
+button.hjaelp-top:hover{background:#1d4ed8}
 :focus-visible{outline:4px solid #fbbf24;outline-offset:2px}
 main{max-width:46rem;margin:0 auto;padding:1rem 1rem 0 1rem} /* Fjerner luft i bunden af main */
 .bar{display:grid;gap:.6rem;margin-bottom:0}
@@ -306,6 +308,151 @@ button.del-btn:hover {
   display: none;
 }
 
+#hjaelpDialog {
+  max-width: 36rem;
+  max-height: 88vh;
+  overflow: auto;
+}
+
+#hjaelpDialog h2 {
+  margin-top: 0;
+  font-size: 1.25rem;
+  color: var(--hav);
+}
+
+.guide-intro {
+  margin: .2rem 0 1rem;
+  font-size: .95rem;
+  color: #334155;
+}
+
+.guide-kort {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-left: 6px solid var(--hav);
+  border-radius: .9rem;
+  padding: .9rem 1rem;
+  margin-bottom: .9rem;
+  break-inside: avoid;
+}
+
+.guide-kort h3 {
+  margin: 0 0 .45rem;
+  font-size: 1.05rem;
+  color: var(--nat);
+}
+
+.guide-kort p {
+  margin: .45rem 0 0;
+  font-size: .95rem;
+}
+
+.guide-skitse {
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: .7rem;
+  padding: .6rem .7rem;
+  margin: .45rem 0;
+}
+
+.guide-fs {
+  display: inline-flex;
+  gap: .3rem;
+  background: var(--hav);
+  padding: .35rem .5rem;
+  border-radius: .5rem;
+  align-items: center;
+}
+
+.guide-fs span {
+  display: inline-block;
+  padding: .15rem .55rem;
+  border-radius: .4rem;
+  background: #1e40af;
+  color: #fff;
+  font-weight: 700;
+  font-size: .85rem;
+}
+
+.guide-fs span.aktiv {
+  background: #fff;
+  color: var(--hav);
+}
+
+.guide-bund {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: .35rem;
+}
+
+.guide-fane {
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: .6rem;
+  padding: .45rem .25rem;
+  text-align: center;
+  color: var(--hav);
+  font-size: .78rem;
+  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .25rem;
+}
+
+.guide-fane.aktiv {
+  background: var(--hav);
+  color: #fff;
+  border-color: var(--hav);
+}
+
+.guide-liste {
+  margin: .5rem 0 0;
+  padding-left: 1.1rem;
+  font-size: .92rem;
+}
+
+.guide-liste li {
+  margin: .3rem 0;
+}
+
+.guide-knap-demo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  margin: .4rem 0;
+}
+
+.guide-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  background: #f8fafc;
+  color: var(--hav);
+  border: 1px solid #cbd5e1;
+  border-radius: .55rem;
+  padding: .25rem .65rem;
+  font-size: .84rem;
+  font-weight: 600;
+}
+
+.guide-tag.bla {
+  background: var(--hav);
+  color: #fff;
+  border-color: var(--hav);
+}
+
+.guide-handlinger {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  margin-top: 1rem;
+}
+
+.guide-handlinger button {
+  flex: 1 1 10rem;
+}
+
 @media print {
   @page {
     margin: 1.5cm;
@@ -326,12 +473,29 @@ button.del-btn:hover {
   #pager,
   #sideOpslag > h2,
   #sideOpslag > .status,
-  dialog,
+  body:not(.printing-guide) dialog,
+  body.printing-guide dialog:not(#hjaelpDialog),
+  body.printing-guide main,
+  .guide-handlinger,
   .slet,
   .opslag-akt,
   .arr .kal,
   .nyt {
     display: none !important;
+  }
+  body.printing-guide #hjaelpDialog {
+    display: block !important;
+    position: static !important;
+    max-width: none !important;
+    width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+  body.printing-guide #hjaelpDialog::backdrop {
+    background: transparent !important;
   }
   .print-only-header {
     display: block !important;
@@ -374,6 +538,7 @@ button.del-btn:hover {
   <div class="logo"><img src="icon-192.png" alt="" width="48" height="48"><div><h1>Strandhusene - Afdeling 55</h1><small>Lodsvej/Anløbsbroen - 6100 Haderslev</small></div></div>
   <div class="top">
    <div class="fs" title="Skriftstørrelse"><button data-fs="sm" aria-label="Lille tekst">T</button><button data-fs="" class="on" aria-label="Større tekst">T+</button><button data-fs="lg" aria-label="Størst tekst">T++</button></div>
+   <button type="button" class="hjaelp-top" id="hjaelpTop" aria-label="Sådan virker appen">? Hjælp</button>
 <button class="rav" id="rolle-top" hidden>Log ud</button>  
   </div>
  </div>
@@ -632,7 +797,10 @@ button.del-btn:hover {
 <footer style="padding-bottom: 6rem; padding-top: 0.8rem; line-height: 1.8;">
   <div>© 2026 Strandhusene - Afdeling 55</div>
   <div style="font-size: 0.85rem; margin-top: 0.2rem;">Seniorbofællesskab</div>
-  <button type="button" class="lys" id="omdata" style="margin-top: 0.8rem; font-size: 0.85rem; padding: 0.4rem 1rem;">Om appen og dine data</button>
+  <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:0.5rem; margin-top:0.8rem;">
+    <button type="button" class="lys" id="hjaelpBund" style="font-size: 0.85rem; padding: 0.4rem 1rem;">Sådan virker appen</button>
+    <button type="button" class="lys" id="omdata" style="font-size: 0.85rem; padding: 0.4rem 1rem;">Om appen og dine data</button>
+  </div>
 <div style="text-align: center; margin: 0.5rem 1rem 0;">
   <button class="rav" id="rolle-bund" style="width: 100%; max-width: 30rem;">Log ind som redaktør</button>
 </div>
@@ -771,6 +939,95 @@ button.del-btn:hover {
  </div>
  <p class="status" id="delStatus" role="status" style="margin-top:.6rem"></p>
  <button type="button" id="delLuk" class="lys" style="width:100%;margin-top:.8rem">Luk</button>
+</dialog>
+
+<dialog id="hjaelpDialog" aria-labelledby="hjaelpOverskrift">
+ <div class="print-only-header">Afdeling 55 Strandhusene · Sådan virker appen</div>
+ <h2 id="hjaelpOverskrift" tabindex="-1" style="outline:none">Sådan virker appen</h2>
+ <p class="guide-intro">Her kan du se, hvordan du finder rundt i Strandhusenes opslagstavle. Du kan ikke ødelægge noget ved at trykke på knapperne.</p>
+
+ <section class="guide-kort">
+  <h3>1. Gør teksten større</h3>
+  <div class="guide-skitse">
+   <div class="guide-fs" aria-hidden="true">
+    <span>T</span>
+    <span class="aktiv">T+</span>
+    <span>T++</span>
+   </div>
+  </div>
+  <p>Øverst til højre kan du vælge skriftstørrelse. Tryk på <b>T++</b>, hvis du ønsker de største bogstaver. Appen husker dit valg til næste gang.</p>
+ </section>
+
+ <section class="guide-kort">
+  <h3>2. De 4 faner nederst på skærmen</h3>
+  <div class="guide-skitse">
+   <div class="guide-bund" aria-hidden="true">
+    <div class="guide-fane aktiv">
+     <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+     <span>Opslag</span>
+    </div>
+    <div class="guide-fane">
+     <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+     <span>Aktiviteter</span>
+    </div>
+    <div class="guide-fane">
+     <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+     <span>Fotos</span>
+    </div>
+    <div class="guide-fane">
+     <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+     <span>Kontakt</span>
+    </div>
+   </div>
+  </div>
+  <ul class="guide-liste">
+   <li><b>Opslag:</b> Nye beskeder, vigtige informationer og arrangementer.</li>
+   <li><b>Aktiviteter:</b> Ugens faste aktiviteter i Strandhusene.</li>
+   <li><b>Fotos:</b> Billeder fra fester, udflugter og fællesspisning.</li>
+   <li><b>Kontakt:</b> Telefonnumre til vigtige personer samt 112 og 114.</li>
+  </ul>
+ </section>
+
+ <section class="guide-kort">
+  <h3>3. Knapper på et opslag</h3>
+  <div class="guide-skitse">
+   <div class="guide-knap-demo" aria-hidden="true">
+    <span class="guide-tag">
+     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+     Udskriv
+    </span>
+    <span class="guide-tag">
+     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+     Del
+    </span>
+    <span class="guide-tag">
+     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+     Tilføj til kalender
+    </span>
+   </div>
+  </div>
+  <ul class="guide-liste">
+   <li><b>Udskriv:</b> Printer kun det ene opslag på papir.</li>
+   <li><b>Del:</b> Sender opslaget som SMS eller e-mail til en nabo eller pårørende.</li>
+   <li><b>Billeder:</b> Tryk på et billede i et opslag for at se det i stor størrelse.</li>
+  </ul>
+ </section>
+
+ <section class="guide-kort">
+  <h3>4. Få besked, når der er nyt</h3>
+  <div class="guide-skitse">
+   <span class="guide-tag bla" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+    Få besked, når der er nyt
+   </span>
+  </div>
+  <p>Tryk på knappen øverst under <b>Opslag</b>, hvis du vil have en besked på telefonen, så snart der kommer et nyt opslag.</p>
+ </section>
+
+ <div class="guide-handlinger">
+  <button type="button" id="hjaelpPrint" class="lys">Udskriv guide</button>
+  <button type="button" id="hjaelpLuk">Luk</button>
+ </div>
 </dialog>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -998,7 +1255,7 @@ m.append(
   if(obs){obs.disconnect();l.querySelectorAll("article").forEach(a=>obs.observe(a))}
 }
 function rydPrint(){
-  document.body.classList.remove("printing-single");
+  document.body.classList.remove("printing-single","printing-guide");
   document.querySelectorAll("article.print-target").forEach(el=>el.classList.remove("print-target"));
 }
 window.addEventListener("afterprint",rydPrint);
@@ -1849,6 +2106,20 @@ $("fil").onchange=async e=>{
 };
 $("omdata").onclick=()=>{$("pa").textContent=K.dataansvarlig||"[dataansvarlig udfyldes i config.js]";$("pk").textContent=K.kontakt||"[kontaktoplysninger udfyldes i config.js]";$("privat").showModal();$("privat").scrollTop=0;requestAnimationFrame(()=>{$("privat").scrollTop=0})};
 $("privatluk").onclick=()=>$("privat").close();
+function aabnHjaelp(){
+  $("hjaelpDialog").showModal();
+  $("hjaelpDialog").scrollTop=0;
+  requestAnimationFrame(()=>{$("hjaelpDialog").scrollTop=0;$("hjaelpOverskrift").focus()});
+}
+$("hjaelpTop").onclick=aabnHjaelp;
+$("hjaelpBund").onclick=aabnHjaelp;
+$("hjaelpLuk").onclick=()=>$("hjaelpDialog").close();
+$("hjaelpDialog").onclick=e=>{if(e.target===$("hjaelpDialog"))$("hjaelpDialog").close()};
+$("hjaelpPrint").onclick=()=>{
+  rydPrint();
+  document.body.classList.add("printing-guide");
+  window.print();
+};
 $("luk").onclick=()=>$("foto").close();
 $("foto").onclick=e=>{if(e.target===$("foto"))$("foto").close()};
 
