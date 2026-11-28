@@ -265,7 +265,8 @@ footer{
   gap: .5rem;
 }
 
-button.print-btn {
+button.print-btn,
+button.del-btn {
   display: inline-flex;
   align-items: center;
   gap: .4rem;
@@ -278,9 +279,27 @@ button.print-btn {
   font-weight: 600;
 }
 
-button.print-btn:hover {
+button.print-btn:hover,
+button.del-btn:hover {
   background: #eff6ff;
   border-color: #93c5fd;
+}
+
+.del-valg {
+  display: grid;
+  gap: .6rem;
+  margin-top: .9rem;
+}
+
+.del-valg .ring,
+.del-valg button {
+  margin-top: 0;
+  width: 100%;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
 }
 
 .print-only-header {
@@ -728,6 +747,31 @@ button.print-btn:hover {
  </div>
 </dialog>
 <dialog id="foto"><img id="stor" alt=""><button type="button" id="luk" style="width:100%">Luk</button></dialog>
+<dialog id="delDialog" aria-labelledby="delOverskrift">
+ <h2 id="delOverskrift" style="margin-top:0">Del opslag</h2>
+ <p id="delTitel" style="margin:.2rem 0 .4rem;font-weight:700"></p>
+ <p style="margin:0;font-size:.9rem;color:#475569">Vælg hvordan du vil sende opslaget videre til en nabo eller et familiemedlem:</p>
+ <div class="del-valg">
+  <a class="ring" id="delSms" href="#">
+   <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+   <span>Send som SMS</span>
+  </a>
+  <a class="ring lys2" id="delMail" href="#">
+   <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+   <span>Send som e-mail</span>
+  </a>
+  <button type="button" class="lys" id="delKopier">
+   <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+   <span>Kopiér tekst</span>
+  </button>
+  <button type="button" class="lys" id="delNative" hidden>
+   <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+   <span>Flere måder at dele på …</span>
+  </button>
+ </div>
+ <p class="status" id="delStatus" role="status" style="margin-top:.6rem"></p>
+ <button type="button" id="delLuk" class="lys" style="width:100%;margin-top:.8rem">Luk</button>
+</dialog>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -916,7 +960,12 @@ m.append(
     printBtn.setAttribute("aria-label","Udskriv opslag: "+(o.titel||""));
     printBtn.innerHTML=`<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg><span>Udskriv</span>`;
     printBtn.onclick=()=>udskrivOpslag(a);
-    aktDiv.append(printBtn);
+    const delBtn=el("button","del-btn");
+    delBtn.type="button";
+    delBtn.setAttribute("aria-label","Del opslag: "+(o.titel||""));
+    delBtn.innerHTML=`<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg><span>Del</span>`;
+    delBtn.onclick=()=>aabnDel(o);
+    aktDiv.append(printBtn,delBtn);
     a.append(aktDiv);
     if(kode){
       const d=el("div","slet");
@@ -960,6 +1009,58 @@ function udskrivOpslag(a){
   document.body.classList.add("printing-single");
   window.print();
 }
+function delTekst(o){
+  const linjer=[o.titel||"Opslag fra Strandhusene"];
+  if(o.arrangement&&o.arrangement.dato){
+    const d=new Date(o.arrangement.dato+"T12:00:00");
+    let dt=d.toLocaleDateString("da-DK",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+    dt=dt.charAt(0).toUpperCase()+dt.slice(1)+(o.arrangement.tid?" kl. "+o.arrangement.tid.replace(":","."):"");
+    linjer.push("Dato: "+dt);
+    if(o.arrangement.sted)linjer.push("Sted: "+o.arrangement.sted);
+  }
+  if(o.tekst)linjer.push("",o.tekst);
+  if(o.afsender)linjer.push("","Fra: "+o.afsender);
+  linjer.push("","Se opslagstavlen: "+SIDEURL);
+  return linjer.join("\n");
+}
+async function kopierTekst(tekst){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    await navigator.clipboard.writeText(tekst);
+    return;
+  }
+  const ta=document.createElement("textarea");
+  ta.value=tekst;ta.style.position="fixed";ta.style.opacity="0";
+  document.body.append(ta);ta.select();document.execCommand("copy");ta.remove();
+}
+function aabnDel(o){
+  const tekst=delTekst(o);
+  const emne="Opslag fra Strandhusene: "+(o.titel||"");
+  $("delTitel").textContent=o.titel||"Opslag";
+  $("delStatus").textContent="";
+  $("delSms").href="sms:?body="+encodeURIComponent(tekst);
+  $("delMail").href="mailto:?subject="+encodeURIComponent(emne)+"&body="+encodeURIComponent(tekst);
+  $("delKopier").onclick=async()=>{
+    try{
+      await kopierTekst(tekst);
+      $("delStatus").textContent="Teksten er kopieret – du kan nu sætte den ind i en SMS eller mail.";
+    }catch(e){
+      $("delStatus").textContent="Kunne ikke kopiere automatisk. Brug SMS- eller e-mailknappen ovenfor.";
+    }
+  };
+  const harNative=typeof navigator.share==="function";
+  $("delNative").hidden=!harNative;
+  $("delNative").onclick=async()=>{
+    try{
+      await navigator.share({title:emne,text:tekst,url:SIDEURL});
+      $("delDialog").close();
+    }catch(e){
+      if(e&&e.name!=="AbortError")$("delStatus").textContent="Deling blev ikke gennemført på denne enhed.";
+    }
+  };
+  $("delDialog").showModal();
+}
+$("delLuk").onclick=()=>$("delDialog").close();
+$("delDialog").onclick=e=>{if(e.target===$("delDialog"))$("delDialog").close()};
 $("s").oninput=()=>{sideNr=1;vis()};
 $("chips").onclick=e=>{const f=e.target.dataset.f;if(!f)return;filter=f;sideNr=1;
   [...$("chips").children].forEach(b=>b.classList.toggle("on",b.dataset.f===f));vis()};
