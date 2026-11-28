@@ -254,6 +254,51 @@ footer{
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
 }
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  /* Skjul alt standard-indhold */
+  body * {
+    visibility: hidden;
+  }
+  
+  /* Gør kun det valgte opslag synligt */
+  .print-aktiv,
+  .print-aktiv * {
+    visibility: visible;
+  }
+  
+  /* Placer opslaget pænt i toppen af siden */
+  .print-aktiv {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+  }
+  
+  /* Skjul knapper og andet unødvendigt i selve opslaget */
+  .print-aktiv .slet,
+  .print-aktiv .pt {
+    display: none !important;
+  }
+  
+  /* Gør teksten nem at læse på papir (sort i stedet for grå) */
+  .print-aktiv p,
+  .print-aktiv h3 {
+    color: #000 !important;
+  }
+  
+  /* Sørg for, at billeder ikke bliver klippet af */
+  .print-aktiv img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+}
+
 </style>
 </head>
   <body>
@@ -810,6 +855,18 @@ m.append(
     
     if(mk)m.firstChild.prepend(el("span","nyt"+(mk==="RETTET"?" rettet":""),mk));
     a.append(m,el("h3","",o.titel));
+
+    // Print-knap til alle
+    const p = el("button","lys");
+    p.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:text-bottom; margin-right:4px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>Udskriv`;
+    p.style.marginTop = "10px";
+    p.onclick = () => {
+      a.classList.add("print-aktiv");
+      window.print();
+      a.classList.remove("print-aktiv");
+    };
+    a.append(p);
+    
     a.append(el("p","",o.tekst));
     if(o.arrangement&&o.arrangement.dato && typeof arrBox === "function")a.append(arrBox(o));
     const bl=(o.billeder||[]).filter(x=>x&&typeof x.url==="string"&&x.url.startsWith("https://firebasestorage.googleapis.com/"));
@@ -839,6 +896,17 @@ m.append(
       r.onclick=()=>{ if(typeof window.startRet === "function") window.startRet(o); };
       b.onclick=()=>slet(o.id);
       d.append(r,b);
+
+      // Print-knap (tilføjet til redaktør-knapperne for nemheds skyld, men kan flyttes)
+      const p = el("button","lys"); // Vi genbruger den lyse stil
+      p.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:4px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg><span style="display:block; font-size:0.75rem; line-height:1;">Print<br>opslag</span>`;
+      p.onclick = () => {
+        // Vi sætter en klasse på det valgte opslag, så CSS'en ved hvad der skal printes
+        a.classList.add("print-aktiv");
+        window.print();
+        a.classList.remove("print-aktiv");
+      };
+      d.append(p);
       
       a.append(d);
     }
